@@ -9,6 +9,20 @@
 
 <div class="container border-bottom-dark border-right border-left">
   <div class="row row-cols-3 justify-content-center">
-    <input type="button" class="button col m-2" value="Test" id="button">
+    <input type="button" class="button col m-2" value="Start" (click)="onClickStart()" #Start>
+    <input type="button" class="button col m-2" value="Stop" (click)="onClickStop()" #Stop>
+    <input type="file" class="button col m-2" title="Save File" (click)="onClickSaveFile()" #SaveFile>
+  </div>
+  <div class="row row-cols-3 justify-content-center">
+    {{ getTime() }}
+  </div>
+  <ng-container *abTests="'old'">
+    TestText old
+  </ng-container>
+  <ng-container *abTests="'new'">
+    TestText new
+  </ng-container>
+  <div *abTests="' new  , old '">
+    TestText new and old
   </div>
 </div>
