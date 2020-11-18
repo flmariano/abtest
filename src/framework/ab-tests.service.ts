@@ -1,21 +1,29 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
-import { version } from "punycode";
 import { LocalStorageHandler } from "./data-handlers";
 
 @Injectable()
 export class AbTestsService implements OnDestroy {
     private _version: string;
+    private _serverUrl = "http://localhost:3000/";
 
     private time: number;
     private timeDiff: number;
     private running: boolean;
 
-    private intervalId;
+    private intervalId: NodeJS.Timer;
 
-    constructor(private _localStorageHandler: LocalStorageHandler) {
+    constructor(private _localStorageHandler: LocalStorageHandler,
+                private _httpClient: HttpClient) {
         var versions = ['old', 'new'];
         this._version = versions[Math.floor(Math.random() * 100) % 2];
-        this._version = 'old';
+
+        var ver = this.getVersion();
+        if (!ver) {
+            this.setVersion(this._version);
+        } else {
+            this._version = ver.toString();
+        }
     }
 
     ngOnDestroy() {
@@ -23,9 +31,9 @@ export class AbTestsService implements OnDestroy {
             clearInterval(this.intervalId);
     }
 
-    public getVersion(): string | boolean {
+    public getVersion(): string {
         var version = this._localStorageHandler.get("version");
-        return version || false;
+        return version;
     }
 
     public setVersion(version: string) {
@@ -50,24 +58,47 @@ export class AbTestsService implements OnDestroy {
         return this.timeDiff;
     }
 
-    public stopMeasurement(version: string) {
+    public stopMeasurement() {
         if (this.running) {
             this.running = false;
-            this.saveMeasurement(version);
+            this.saveMeasurement();
         } else {
             console.warn("not running")
         }
     }
 
-    public saveMeasurement(version: string) {
+    public saveMeasurement() {
+        if (this.timeDiff == undefined) {
+            console.error("can't save measurement before starting timer");
+            return;
+        }
+
         var oldString = this._localStorageHandler.get("measurements");
 
         this._localStorageHandler.set("measurements", oldString ? oldString + ", " + this.timeDiff : this.timeDiff.toString());
-        this._localStorageHandler.set("version", version);
+        this._localStorageHandler.set("version", this._version);
+
+        this.sendMeasurement();
     }
 
+    public sendMeasurement(): boolean {
+        if (this.timeDiff == undefined) return false;
+
+        var body = {
+            version: this._version,
+            data: this.timeDiff
+        }
+
+        this._httpClient.post(this._serverUrl + "data/", body).subscribe(
+            x => {
+                console.warn("response: " + x);
+        })
+        
+        return true;
+    }
+    
     public shouldRender(versions: string[]): boolean {
-        if (versions.includes(this._version)) {
+        if (versions.indexOf(this._version) > -1) {
             return true;
         }
         return false;

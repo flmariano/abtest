@@ -7,31 +7,20 @@ import { AbTestsService } from 'src/framework/ab-tests.service';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent implements OnInit {
-  titles: string[] = [];
   title: string;
   version: string;
 
-  // @ViewChild("button") button: ElementRef;
-
-  constructor(private _abService: AbTestsService) {
-    this.titles[0] = 'A/B testing';
-    this.titles[1] = 'A/B test testing';
-    this.titles[2] = 'no testing';
-  }
+  constructor(private _abService: AbTestsService) { }
 
   ngOnInit(): void {
     var version = this._abService.getVersion();
 
-    if (version != false) {
-      this.title = version.toString();
+    if (version) {
+      this.title = version;
     }
     else {
-      this.title = this.titles[Math.floor(Math.random() * 100) % this.titles.length];
+      this.title = "getversion doesn't work.";
     }
-
-    this.version = this.title; //changes later
-
-    // this._abService.startMeasurement();
   }
 
   onClickStart() {
@@ -39,7 +28,7 @@ export class AppComponent implements OnInit {
   }
 
   onClickStop() {
-    this._abService.stopMeasurement(this.version);
+    this._abService.stopMeasurement();
   }
 
   getTime(): string {
@@ -47,15 +36,10 @@ export class AppComponent implements OnInit {
 
     if(diff) {
       var date = new Date(diff);
-      return date.toISOString().slice(14, -1);
+      return date.toISOString().slice(14, -1); //only get the m, s and ms parts
     }
     else {
       return '';
     }
   }
-
-  // msToTime(t: number): string {
-  //   var ms = t % 1000;
-  //   var s = t / 1000;
-  // }
 }
