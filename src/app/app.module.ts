@@ -4,15 +4,18 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { LocalStorageHandler } from 'src/framework/data-handlers';
-import { AbTestsModule } from 'src/framework/ab-tests.module';
+import { AbTestsModule, AbTestsOptions } from 'src/framework/ab-tests.module';
+import options from 'src/app/options.json';
+
+export const abTestsOptions: AbTestsOptions[] = options; 
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+    AbTestsModule.forRoot(abTestsOptions),
     BrowserModule,
-    AbTestsModule,
     HttpClientModule
   ],
   providers: [LocalStorageHandler],

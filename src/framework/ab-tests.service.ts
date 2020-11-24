@@ -1,5 +1,7 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnDestroy } from "@angular/core";
+import { Inject, Injectable, OnDestroy } from "@angular/core";
+import { CONFIG } from "./ab-tests-injection-token";
+import { AbTestsOptions } from "./ab-tests.module";
 import { LocalStorageHandler } from "./data-handlers";
 
 @Injectable()
@@ -11,12 +13,21 @@ export class AbTestsService implements OnDestroy {
     private timeDiff: number;
     private running: boolean;
 
-    private intervalId: NodeJS.Timer;
+    private intervalId;
 
-    constructor(private _localStorageHandler: LocalStorageHandler,
-                private _httpClient: HttpClient) {
-        var versions = ['old', 'new'];
-        this._version = versions[Math.floor(Math.random() * 100) % 2];
+    constructor(
+        @Inject(CONFIG) configs: AbTestsOptions[],
+        private _localStorageHandler: LocalStorageHandler,
+        private _httpClient: HttpClient
+        ) {
+        var versions = ["old", "new"];
+
+        if (configs[0] != undefined){
+            versions = configs[0].versions;
+        } else {
+            console.error("configs[0] is undefined");
+        }
+        this._version = versions[Math.floor(Math.random() * 100) % versions.length];
 
         var ver = this.getVersion();
         if (!ver) {
@@ -76,8 +87,6 @@ export class AbTestsService implements OnDestroy {
         var oldString = this._localStorageHandler.get("measurements");
 
         this._localStorageHandler.set("measurements", oldString ? oldString + ", " + this.timeDiff : this.timeDiff.toString());
-        this._localStorageHandler.set("version", this._version);
-
         this.sendMeasurement();
     }
 
