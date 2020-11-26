@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { LocalStorageHandler } from 'src/framework/data-handlers';
+import { LocalStorageHandler } from 'src/framework/local-storage-handler';
 import { AbTestsModule, AbTestsOptions } from 'src/framework/ab-tests.module';
 import options from 'src/app/options.json';
 

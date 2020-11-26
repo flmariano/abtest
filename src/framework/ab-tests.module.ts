@@ -7,6 +7,9 @@ import { CONFIG } from "./ab-tests-injection-token";
 
 export interface AbTestsOptions {
     versions: string[];
+    weights?: {
+      [x: string]: number,
+    };
 }
 
 @NgModule({

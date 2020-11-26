@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
   constructor(private _abService: AbTestsService) { }
 
   ngOnInit(): void {
-    var version = this._abService.getVersion();
+    let version = this._abService.getVersion();
 
     if (version) {
       this.title = version;
@@ -32,10 +32,10 @@ export class AppComponent implements OnInit {
   }
 
   getTime(): string {
-    var diff = this._abService.getTimeDiff();
+    let diff = this._abService.getTimeDiff();
 
     if(diff) {
-      var date = new Date(diff);
+      let date = new Date(diff);
       return date.toISOString().slice(14, -1); //only get the m, s and ms parts
     }
     else {

@@ -1,5 +1,6 @@
 [
     {
-      "versions": [ "old", "new" ]
+      "versions": [ "old", "new", "test", "test2", "test3" ],
+      "weights": {"old": 50, "test": 10, "new2": 40}
     }
 ]
