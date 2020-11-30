@@ -1,6 +1,27 @@
 [
     {
-      "versions": [ "old", "new", "test", "test2", "test3" ],
-      "weights": {"old": 50, "test": 10, "new2": 40}
+      "contexts": [
+        {
+          "version": "old",
+          "scope": "v1"
+        },
+        {
+          "version": "new",
+          "scope": "v1"
+        },
+        {
+          "version": "test1",
+          "scope": "v2"
+        },
+        {
+          "version": "test2",
+          "scope": "v2"
+        },
+        {
+          "version": "test3",
+          "scope": "v2"
+        }
+      ],
+      "weights": {"old": 20, "test": 10, "new2": 40}
     }
 ]

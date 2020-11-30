@@ -6,7 +6,10 @@ import { AbTestsDirective } from "./ab-tests.directive";
 import { CONFIG } from "./ab-tests-injection-token";
 
 export interface AbTestsOptions {
-    versions: string[];
+    contexts: {
+      version: string,
+      scope: string  // unused
+    }[];
     weights?: {
       [x: string]: number,
     };

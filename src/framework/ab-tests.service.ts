@@ -1,48 +1,45 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable, OnDestroy } from "@angular/core";
+import { AbTestsContext } from "./ab-tests-context";
 import { CONFIG } from "./ab-tests-injection-token";
 import { AbTestsOptions } from "./ab-tests.module";
 import { LocalStorageHandler } from "./local-storage-handler";
 
+const AB_SERVER_URL = "http://localhost:3000/";
+
 @Injectable()
 export class AbTestsService implements OnDestroy {
-    private _version: string;   // this field is kind of a problem
-    private _serverUrl = "http://localhost:3000/";
+    private _config: AbTestsOptions;
+    private _context: AbTestsContext;
 
-    private time: number;
-    private timeDiff: number;
-    private running: boolean;
-
-    private intervalId;
+    private _time: number;
+    private _timeDiff: number;
+    private _running: boolean;
+    private _intervalId;
 
     constructor(
         @Inject(CONFIG) configs: AbTestsOptions[],
         private _localStorageHandler: LocalStorageHandler,
         private _httpClient: HttpClient
         ) {
-        // console.log("AbTestsService constructor: " + performance.now() + " ms");
-
-        let versions = ["old", "new"];
-
-        if (configs[0] != undefined){
-            versions = configs[0].versions;
-        } else {
+        if (configs[0] == undefined){
             console.error("configs[0] is undefined");
         }
-        // this._version = versions[Math.floor(Math.random() * 100) % versions.length];
-        this._version = this.getRandomVersion(configs[0]);
+        this._config = configs[0];  // change to be able have multiple
+
+        this._context = this.getRandomContext(this._config);
 
         let ver = this.getVersion();
         // if (!ver) {
         if (true) { // testcode
-            this.setVersion(this._version);
+            this.setVersion(this._context.version);
         } else {
-            this._version = ver.toString();
+            this._context.version = ver.toString();
         }
     }
 
     ngOnDestroy() {
-        if (this.intervalId) clearInterval(this.intervalId);
+        if (this._intervalId) clearInterval(this._intervalId);
     }
 
     public getVersion(): string {
@@ -58,52 +55,52 @@ export class AbTestsService implements OnDestroy {
     }
 
     public startMeasurement() {
-        this.time = Date.now();
-        this.timeDiff = 0;
-        this.running = true;
+        this._time = Date.now();
+        this._timeDiff = 0;
+        this._running = true;
 
-        this.intervalId = setInterval(() => this.updateTimeDiff(), 1);
+        this._intervalId = setInterval(() => this.updateTimeDiff(), 1);
     }
 
     public updateTimeDiff() {
-        if (this.running)
-            this.timeDiff = Date.now() - this.time;
+        if (this._running)
+            this._timeDiff = Date.now() - this._time;
     }
 
     public getTimeDiff() {
-        return this.timeDiff;
+        return this._timeDiff;
     }
 
     public stopMeasurement() { // start und stop reicht nicht
-        if (this.running) {
-            this.running = false;
+        if (this._running) {
+            this._running = false;
             this.saveMeasurement();
         } else {
-            console.warn("not running")
+            console.warn("not _running")
         }
     }
 
     public saveMeasurement() {
-        if (this.timeDiff == undefined) {
+        if (this._timeDiff == undefined) {
             console.error("can't save measurement before starting timer");
             return;
         }
 
         let oldString = this._localStorageHandler.get("measurements");
 
-        this._localStorageHandler.set("measurements", oldString ? oldString + ", " + this.timeDiff : this.timeDiff.toString());
+        this._localStorageHandler.set("measurements", oldString ? oldString + ", " + this._timeDiff : this._timeDiff.toString());
         this.sendMeasurement();
     }
 
     public sendMeasurement(): boolean {
-        if (this.timeDiff == undefined) return false;
+        if (this._timeDiff == undefined) return false;
 
         let body = {
-            version: this._version,
-            data: this.timeDiff
+            version: this._context.version,
+            data: this._timeDiff
         }
 
-        this._httpClient.post(this._serverUrl + "data/", body).subscribe(
+        this._httpClient.post(AB_SERVER_URL + "data/", body).subscribe(
             x => {
                 console.warn("response: " + x);
         })
@@ -112,17 +109,19 @@ export class AbTestsService implements OnDestroy {
     }
     
     public shouldRender(versions: string[]): boolean {
-        return versions.indexOf(this._version) > -1;
+        return versions.indexOf(this._context.version) > -1;
     }
 
-    private getRandomVersion(config: AbTestsOptions): string {
+    private getRandomContext(config: AbTestsOptions): AbTestsContext {
         let sumOfWeights = 0;
         let numOfWeightless = 0;
+        let versions = [];
 
-        config = this.filterWeights(config);
+        for(let context in config.contexts) versions.push(config.contexts[context].version);
+        config = this.filterWeights(versions, config);
 
-        for (let i = 0; i < config.versions.length; i++) {
-            let weight = config.weights[config.versions[i]];
+        for (let i = 0; i < versions.length; i++) {
+            let weight = config.weights[versions[i]];
             if (weight) {
                 sumOfWeights += weight;
             } else {
@@ -135,12 +134,12 @@ export class AbTestsService implements OnDestroy {
             throw new Error ("sum of weights exceeds 100 before filling");
         }
 
-        for (let i = 0; i < config.versions.length; i++) {
-            if (!config.weights[config.versions[i]]) {
+        for (let i = 0; i < versions.length; i++) {
+            if (!config.weights[versions[i]]) {
                 if(numOfWeightless === 0) break;
 
                 let newWeight = (100 - sumOfWeights) / numOfWeightless;
-                config.weights[config.versions[i]] = newWeight;
+                config.weights[versions[i]] = newWeight;
 
                 sumOfWeights += newWeight;
                 numOfWeightless--;
@@ -161,20 +160,36 @@ export class AbTestsService implements OnDestroy {
         let sum = 0, i;
         for(i in config.weights) {
             sum += config.weights[i];
-            if (r < sum) return i;
+            if (r < sum) break;
         }
-        return i; // if none were chosen (because it doesn't add up to 100) return the last
+        
+        for(let c in config.contexts) {
+            let context = config.contexts[c];
+            if (context.version == i) {
+                return context;
+            }
+        }
+
+        throw Error("no context selected");
     }
 
-    private filterWeights(config: AbTestsOptions): AbTestsOptions {
+    private filterWeights(versions: string[], config: AbTestsOptions): AbTestsOptions {
         for(let i in config.weights) {
-            if (!config.versions.includes(i)) delete config.weights[i]; // removes extraneous element
+            if (!versions.includes(i)) delete config.weights[i]; // removes extraneous element
         }
         return config;
     }
 
-    getConfigInfo(version: string) {
+    getContextInfo(version: string): AbTestsContext {
+        if (this._context.version == version) return this._context;
+        else {
+            // return this._config[version];   // need to change config structure
+            return null;
+        }
+    }
 
+    public setLoadTime(time: number): void {
+        this._context.loadTime = time;
     }
 
     //dauer des renderns einer komponente und wie das den kunden beeinflusst

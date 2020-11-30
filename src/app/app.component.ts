@@ -11,7 +11,6 @@ export class AppComponent implements OnInit {
   version: string;
 
   constructor(private _abService: AbTestsService) { 
-    // abtimer.stop();
     console.log("AppComponent constructor: " + performance.now() + " ms");
   }
 
@@ -27,7 +26,9 @@ export class AppComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    console.log("AppComponent ngAfterViewInit: " + performance.now() + " ms");
+    var time = performance.now();
+    console.log("AppComponent ngAfterViewInit: " + time + " ms");
+    this._abService.setLoadTime(time);
   }
 
   onClickStart() {
