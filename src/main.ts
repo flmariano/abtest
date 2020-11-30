@@ -11,3 +11,5 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
 
+// export var abtimer = new ABTimer("from main.ts");
+console.log("main.ts: " + performance.now() + " ms");

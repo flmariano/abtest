@@ -20,6 +20,8 @@ export class AbTestsService implements OnDestroy {
         private _localStorageHandler: LocalStorageHandler,
         private _httpClient: HttpClient
         ) {
+        // console.log("AbTestsService constructor: " + performance.now() + " ms");
+
         let versions = ["old", "new"];
 
         if (configs[0] != undefined){
@@ -31,8 +33,8 @@ export class AbTestsService implements OnDestroy {
         this._version = this.getRandomVersion(configs[0]);
 
         let ver = this.getVersion();
-        if (!ver) {
-        // if (true) { // testcode
+        // if (!ver) {
+        if (true) { // testcode
             this.setVersion(this._version);
         } else {
             this._version = ver.toString();
@@ -60,7 +62,7 @@ export class AbTestsService implements OnDestroy {
         this.timeDiff = 0;
         this.running = true;
 
-        this.intervalId = setInterval(() => this.updateTimeDiff(), 61);
+        this.intervalId = setInterval(() => this.updateTimeDiff(), 1);
     }
 
     public updateTimeDiff() {
@@ -72,7 +74,7 @@ export class AbTestsService implements OnDestroy {
         return this.timeDiff;
     }
 
-    public stopMeasurement() {
+    public stopMeasurement() { // start und stop reicht nicht
         if (this.running) {
             this.running = false;
             this.saveMeasurement();
@@ -171,4 +173,21 @@ export class AbTestsService implements OnDestroy {
         return config;
     }
 
+    getConfigInfo(version: string) {
+
+    }
+
+    //dauer des renderns einer komponente und wie das den kunden beeinflusst
+
+    // allgemein mehr kontext
+
+    // pfad des mauszeigers evtl.
+
+    // device des users
+
+    // mehrere measurements auf einmal
+
+
+    // conversion rate
+    
 }

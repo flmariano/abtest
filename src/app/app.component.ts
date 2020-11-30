@@ -10,7 +10,10 @@ export class AppComponent implements OnInit {
   title: string;
   version: string;
 
-  constructor(private _abService: AbTestsService) { }
+  constructor(private _abService: AbTestsService) { 
+    // abtimer.stop();
+    console.log("AppComponent constructor: " + performance.now() + " ms");
+  }
 
   ngOnInit(): void {
     let version = this._abService.getVersion();
@@ -21,6 +24,10 @@ export class AppComponent implements OnInit {
     else {
       this.title = "getversion doesn't work.";
     }
+  }
+
+  ngAfterViewInit(): void {
+    console.log("AppComponent ngAfterViewInit: " + performance.now() + " ms");
   }
 
   onClickStart() {
