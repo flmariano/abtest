@@ -1,11 +1,19 @@
-class ABTimer {
-    readonly start = performance.now();
+export class AbTimer {
+    private start = performance.now();
   
-    constructor(private readonly name: string) {}
+    // constructor(private readonly name: string) {}
   
-    stop(): number {
+    public getTime(): number {
       const time = performance.now() - this.start;
-      console.log('Timer:', this.name, 'finished in', Math.round(time), 'ms');
+      console.log("Timer: ", "[name]", " measured at ", Math.round(time), "ms");
       return time;
+    }
+
+    public reset(): void {
+      this.start = performance.now();
+    }
+
+    public getStartTime(): number {
+      return this.start;
     }
 }

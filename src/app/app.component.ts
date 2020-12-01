@@ -9,6 +9,11 @@ import { AbTestsService } from 'src/framework/ab-tests.service';
 export class AppComponent implements OnInit {
   title: string;
   version: string;
+  loadTime: string;
+
+  private readonly timerName = "t1";
+  private readonly timerName2 = "t2";
+  private timerStartTime: number;
 
   constructor(private _abService: AbTestsService) { 
     console.log("AppComponent constructor: " + performance.now() + " ms");
@@ -23,24 +28,32 @@ export class AppComponent implements OnInit {
     else {
       this.title = "getversion doesn't work.";
     }
-  }
 
-  ngAfterViewInit(): void {
     var time = performance.now();
-    console.log("AppComponent ngAfterViewInit: " + time + " ms");
+    console.log("AppComponent ngOnInit: " + time + " ms");
     this._abService.setLoadTime(time);
+    this.loadTime = time.toFixed(0);
+
+    this._abService.startTimer(this.timerName);
+    this._abService.startTimer(this.timerName2);
   }
 
   onClickStart() {
-    this._abService.startMeasurement();
+    this._abService.startTimer(this.timerName);
   }
 
   onClickStop() {
-    this._abService.stopMeasurement();
+    this._abService.saveMeasurements([this.timerName, this.timerName2]);
   }
 
   getTime(): string {
-    let diff = this._abService.getTimeDiff();
+    let diff = 0;
+    
+    if(this.timerStartTime) {
+      diff = performance.now() - this.timerStartTime;
+    } else {
+      this.timerStartTime = this._abService.getTimerStartTime(this.timerName);
+    }
 
     if(diff) {
       let date = new Date(diff);

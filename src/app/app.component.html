@@ -13,7 +13,10 @@
     <input type="button" class="button col m-2" value="Stop" (click)="onClickStop()" #Stop>
   </div>
   <div class="row row-cols-3 justify-content-center">
-    {{ getTime() }}
+    Timer: {{ getTime() }}
+  </div>
+  <div class="row row-cols-3 justify-content-center" *ngIf="loadTime">
+    Load time: {{loadTime}} ms
   </div>
   <ng-container *abTests="'old'">
     TestText old
