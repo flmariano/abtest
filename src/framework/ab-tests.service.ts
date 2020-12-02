@@ -6,6 +6,7 @@ import { CONFIG } from "./ab-tests-injection-token";
 import { AbTestsOptions } from "./ab-tests.module";
 import { AbTimer } from "./ab-timer";
 import { LocalStorageHandler } from "./local-storage-handler";
+import { uuid } from "./utilities";
 
 const AB_SERVER_URL = "http://localhost:3000/";
 
@@ -13,6 +14,7 @@ const AB_SERVER_URL = "http://localhost:3000/";
 export class AbTestsService {
     private _config: AbTestsOptions;
     private _context: AbTestsContext;
+    private _sessionId: string;
 
     constructor(
         @Inject(CONFIG) configs: AbTestsOptions[],
@@ -26,6 +28,7 @@ export class AbTestsService {
         this._config = configs[0];  // change to be able have multiple
 
         this._context = this.getRandomContext(this._config);
+        this._sessionId = uuid();
 
         let ver = this.getVersion();
         // if (!ver) {
@@ -115,6 +118,7 @@ export class AbTestsService {
         times.forEach((value, key) => (measurements[key] = value));
 
         let body = {
+            sessionId: this._sessionId,
             version: this._context.version,
             scope: this._context.scope,
             measurements: measurements,
@@ -129,6 +133,7 @@ export class AbTestsService {
 
     private sendArrivalData(): void {
         let body = {
+            sessionId: this._sessionId,
             version: this._context.version,
             scope: this._context.scope,
             loadTime: this._context.loadTime,
