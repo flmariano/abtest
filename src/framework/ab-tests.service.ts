@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
+import { DeviceDetectorService } from "ngx-device-detector";
 import { AbTestsContext } from "./ab-tests-context";
 import { CONFIG } from "./ab-tests-injection-token";
 import { AbTestsOptions } from "./ab-tests.module";
@@ -16,7 +17,8 @@ export class AbTestsService {
     constructor(
         @Inject(CONFIG) configs: AbTestsOptions[],
         private _localStorageHandler: LocalStorageHandler,
-        private _httpClient: HttpClient
+        private _httpClient: HttpClient,
+        deviceDetector: DeviceDetectorService
     ) {
         if (configs[0] == undefined) {
             console.error("configs[0] is undefined");
@@ -32,7 +34,15 @@ export class AbTestsService {
         } else {
             this._context.version = ver.toString();
         }
+
+        this._context.deviceType = deviceDetector.deviceType;
+        this.setLoadTime(performance.now());
+        this.sendArrivalData();
     }
+
+    // ngOnDestroy(): void {
+    //     this.saveMeasurements();
+    // }
 
     public getVersion(): string {
         let version = this._localStorageHandler.get("version");
@@ -72,19 +82,26 @@ export class AbTestsService {
         }
     }
 
-    public saveMeasurements(timerNames: string[]): void {
+    public saveMeasurements(timerNames?: string[]): void {
         let times = new Map<string, number>();
 
-        for (let i in timerNames) {
-            let timerName = timerNames[i];
+        if (timerNames) {
+            for (let i in timerNames) {
+                let timerName = timerNames[i];
 
-            if (!this._context.timers.has(timerName)) { 
-                throw Error("saveMeasurement failed: timer " + timerName + " doesn't exist");
+                if (!this._context.timers.has(timerName)) {
+                    throw Error("saveMeasurement failed: timer " + timerName + " doesn't exist");
+                }
+
+                let timer = this._context.timers.get(timerName);
+                times.set(timerName, timer.getTime());
             }
-
-            let timer = this._context.timers.get(timerName);
-            times.set(timerName, timer.getTime());
+        } else {
+            for (let i in this._context.timers) {
+                times.set(i, this._context.timers.get(i).getTime());
+            }
         }
+
 
         // let oldString = this._localStorageHandler.get("measurements");
         // this._localStorageHandler.set("measurements", oldString ? oldString + ", " + time : time.toString());
@@ -102,10 +119,24 @@ export class AbTestsService {
             scope: this._context.scope,
             measurements: measurements,
             loadTime: this._context.loadTime,
-            timeOnPage: this._context.timeOnPage
         }
 
-        this._httpClient.post(AB_SERVER_URL + "data/", body).subscribe(
+        this._httpClient.post(AB_SERVER_URL + "measurements/", body).subscribe(
+            x => {
+                console.log("response: " + x);
+            })
+    }
+
+    private sendArrivalData(): void {
+        let body = {
+            version: this._context.version,
+            scope: this._context.scope,
+            loadTime: this._context.loadTime,
+            deviceType: this._context.deviceType,
+            arrivalTime: Date.now()
+        }
+
+        this._httpClient.post(AB_SERVER_URL + "arrivals/", body).subscribe(
             x => {
                 console.log("response: " + x);
             })
@@ -183,11 +214,13 @@ export class AbTestsService {
         return config;
     }
 
-    public getContextInfo(version: string): AbTestsContext {
-        if (this._context.version == version) return this._context;
+    public getContextInfo(version?: string): AbTestsContext {
+        if (version == this._context.version || !version) return this._context;
         else {
-            // return this._config[version];   // need to change config structure
-            return null;
+            for (let i in this._config.contexts) {
+                let c = this._config.contexts[i];
+                if (c.version == version) return c;
+            }
         }
     }
 
@@ -199,15 +232,12 @@ export class AbTestsService {
         return this._context.loadTime;
     }
 
-    // dauer des renderns einer komponente und wie das den kunden beeinflusst
-
+    // device des users
     // allgemein mehr kontext
-
+    // conversion rate   
     // pfad des mauszeigers evtl.
 
-    // device des users
-
+    // done-ish:
     // mehrere measurements auf einmal
-
-    // conversion rate   
+    // dauer des renderns einer komponente und wie das den kunden beeinflusst
 }

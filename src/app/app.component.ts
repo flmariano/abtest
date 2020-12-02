@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AbTestsContext } from 'src/framework/ab-tests-context';
 import { AbTestsService } from 'src/framework/ab-tests.service';
 
 @Component({
@@ -10,6 +11,8 @@ export class AppComponent implements OnInit {
   title: string;
   version: string;
   loadTime: string;
+  running: boolean;
+  context: AbTestsContext;
 
   private readonly timerName = "t1";
   private readonly timerName2 = "t2";
@@ -31,36 +34,40 @@ export class AppComponent implements OnInit {
 
     var time = performance.now();
     console.log("AppComponent ngOnInit: " + time + " ms");
-    this._abService.setLoadTime(time);
-    this.loadTime = time.toFixed(0);
+    // this._abService.setLoadTime(time);
+    // this.loadTime = time.toFixed(0);
 
     this._abService.startTimer(this.timerName);
     this._abService.startTimer(this.timerName2);
+
+    this.context = this._abService.getContextInfo();
   }
 
-  onClickStart() {
+  public onClickStart(): void {
     this._abService.startTimer(this.timerName);
+    this.running = true;
   }
 
-  onClickStop() {
+  public onClickStop(): void {
     this._abService.saveMeasurements([this.timerName, this.timerName2]);
+    this.running = false;
   }
 
-  getTime(): string {
-    let diff = 0;
+  // getTime(): string {
+  //   let diff = 0;
     
-    if(this.timerStartTime) {
-      diff = performance.now() - this.timerStartTime;
-    } else {
-      this.timerStartTime = this._abService.getTimerStartTime(this.timerName);
-    }
+  //   if(this.timerStartTime) {
+  //     diff = performance.now() - this.timerStartTime;
+  //   } else {
+  //     this.timerStartTime = this._abService.getTimerStartTime(this.timerName);
+  //   }
 
-    if(diff) {
-      let date = new Date(diff);
-      return date.toISOString().slice(14, -1); //only get the m, s and ms parts
-    }
-    else {
-      return '';
-    }
-  }
+  //   if(diff) {
+  //     let date = new Date(diff);
+  //     return date.toISOString().slice(14, -1); //only get the m, s and ms parts
+  //   }
+  //   else {
+  //     return '';
+  //   }
+  // }
 }

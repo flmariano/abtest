@@ -1,7 +1,7 @@
 export class AbTimer {
-    private start = performance.now();
-  
-    // constructor(private readonly name: string) {}
+    constructor(private start?: number) {
+      this.start = start || performance.now();
+    }
   
     public getTime(): number {
       const time = performance.now() - this.start;

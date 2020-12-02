@@ -7,8 +7,7 @@ export class AbTestsContext {
         public version: string,
         public scope: string,
         public loadTime?: number,
-        public device?: string,
-        public timeOnPage?: number) {
+        public deviceType?: string) {
             this.timers = new Map<string, AbTimer>();
         }
          
