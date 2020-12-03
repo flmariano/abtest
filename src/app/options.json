@@ -3,7 +3,8 @@
       "contexts": [
         {
           "version": "old",
-          "scope": "v1"
+          "scope": "v1",
+          "weight": 22
         },
         {
           "version": "new",
@@ -11,7 +12,8 @@
         },
         {
           "version": "test1",
-          "scope": "v2"
+          "scope": "v2",
+          "weight": 5
         },
         {
           "version": "test2",
@@ -21,7 +23,6 @@
           "version": "test3",
           "scope": "v2"
         }
-      ],
-      "weights": {"old": 20, "test": 10, "new2": 40}
+      ]
     }
 ]

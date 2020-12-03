@@ -154,13 +154,9 @@ export class AbTestsService {
     private getRandomContext(config: AbTestsOptions): AbTestsContext {
         let sumOfWeights = 0;
         let numOfWeightless = 0;
-        let versions = [];
 
-        for (let context in config.contexts) versions.push(config.contexts[context].version);
-        config = this.filterWeights(versions, config);
-
-        for (let i = 0; i < versions.length; i++) {
-            let weight = config.weights[versions[i]];
+        for (let c in config.contexts) {
+            let weight = config.contexts[c].weight;
             if (weight) {
                 sumOfWeights += weight;
             } else {
@@ -169,54 +165,38 @@ export class AbTestsService {
         }
 
         if (sumOfWeights > 100) {
-            // console.error("sum of weights exceeds 100 before filling");
             throw new Error("sum of weights exceeds 100 before filling");
         }
 
-        for (let i = 0; i < versions.length; i++) {
-            if (!config.weights[versions[i]]) {
+        for (let c in config.contexts) {
+            if (!config.contexts[c].weight) {
                 if (numOfWeightless === 0) break;
 
                 let newWeight = (100 - sumOfWeights) / numOfWeightless;
-                config.weights[versions[i]] = newWeight;
+                config.contexts[c].weight = newWeight;
 
                 sumOfWeights += newWeight;
                 numOfWeightless--;
             }
         }
 
-        if (Math.abs(100 - sumOfWeights) > 0.01) { // sumOfWeights should always be exactly 100 but there might be a rounding error
+        if (Math.abs(100 - sumOfWeights) > 0.01) { // sumOfWeights should always be exactly 100 but there might be an unexpected error
             if (sumOfWeights > 100) {
-                // console.error("sum of weights exceeds 100 after filling");
                 throw new Error("sum of weights exceeds 100 after filling");
             } else if (sumOfWeights < 100) {
-                // console.error("sum of weights still below 100 after filling");
                 throw new Error("sum of weights still below 100 after filling");
             }
         }
 
         const r = Math.random() * 100;
-        let sum = 0, i;
-        for (i in config.weights) {
-            sum += config.weights[i];
+        let sum = 0, c;
+        for (c in config.contexts) {
+            sum += config.contexts[c].weight;
             if (r < sum) break;
         }
 
-        for (let c in config.contexts) {
-            let context = config.contexts[c];
-            if (context.version == i) {
-                return new AbTestsContext(context.version, context.scope);
-            }
-        }
-
-        throw Error("no context selected");
-    }
-
-    private filterWeights(versions: string[], config: AbTestsOptions): AbTestsOptions {
-        for (let i in config.weights) {
-            if (!versions.includes(i)) delete config.weights[i]; // removes extraneous element
-        }
-        return config;
+        let context = config.contexts[c];
+        return new AbTestsContext(context.version, context.scope);
     }
 
     public getContextInfo(version?: string): AbTestsContext {
@@ -237,12 +217,12 @@ export class AbTestsService {
         return this._context.loadTime;
     }
 
-    // device des users
     // allgemein mehr kontext
     // conversion rate   
     // pfad des mauszeigers evtl.
-
+    
     // done-ish:
     // mehrere measurements auf einmal
     // dauer des renderns einer komponente und wie das den kunden beeinflusst
+    // device des users
 }
