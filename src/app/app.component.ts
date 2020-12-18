@@ -38,13 +38,12 @@ export class AppComponent implements OnInit {
     // this.loadTime = time.toFixed(0);
 
     this._abService.startTimer(this.timerName);
-    this._abService.startTimer(this.timerName2);
 
     this.context = this._abService.getContextInfo();
   }
 
   public onClickStart(): void {
-    this._abService.startTimer(this.timerName);
+    this._abService.startTimer(this.timerName2);
     this.running = true;
   }
 

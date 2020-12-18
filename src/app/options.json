@@ -3,26 +3,27 @@
       "contexts": [
         {
           "version": "old",
-          "scope": "v1",
           "weight": 22
         },
         {
-          "version": "new",
-          "scope": "v1"
-        },
+          "version": "new"
+        }
+      ],
+      "testName": "v1"
+    },
+    {
+      "contexts": [
         {
           "version": "test1",
-          "scope": "v2",
           "weight": 5
         },
         {
-          "version": "test2",
-          "scope": "v2"
+          "version": "test2"
         },
         {
-          "version": "test3",
-          "scope": "v2"
+          "version": "test3"
         }
-      ]
+      ],
+      "testName": "v2"
     }
 ]

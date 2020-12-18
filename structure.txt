@@ -1,0 +1,11 @@
+Metric
++ serialize
+
+AbTest
++ metrics
++ config (z.B. itemsPerPage)
++ contextInformations (device, browser, Datum, region, sprache)
+
+AbTestService
++ getAbTest("abtest") 
++ save(abtest)

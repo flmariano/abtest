@@ -8,9 +8,10 @@ import { CONFIG } from "./ab-tests-injection-token";
 export interface AbTestsOptions {
     contexts: {
       version: string,
-      scope: string,  // unused
-      weight?: number
+      weight?: number,
+
     }[];
+    testName: string;
 }
 
 @NgModule({

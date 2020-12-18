@@ -120,7 +120,7 @@ export class AbTestsService {
         let body = {
             sessionId: this._sessionId,
             version: this._context.version,
-            scope: this._context.scope,
+            testName: this._context.testName,
             measurements: measurements,
             loadTime: this._context.loadTime,
         }
@@ -135,7 +135,7 @@ export class AbTestsService {
         let body = {
             sessionId: this._sessionId,
             version: this._context.version,
-            scope: this._context.scope,
+            testName: this._context.testName,
             loadTime: this._context.loadTime,
             deviceType: this._context.deviceType,
             arrivalTime: Date.now()
@@ -196,7 +196,7 @@ export class AbTestsService {
         }
 
         let context = config.contexts[c];
-        return new AbTestsContext(context.version, context.scope);
+        return new AbTestsContext(context.version, config.testName);
     }
 
     public getContextInfo(version?: string): AbTestsContext {
@@ -204,7 +204,7 @@ export class AbTestsService {
         else {
             for (let i in this._config.contexts) {
                 let c = this._config.contexts[i];
-                if (c.version == version) return c;
+                if (c.version == version) return {...c, testName: this._config.testName};
             }
         }
     }
@@ -217,12 +217,17 @@ export class AbTestsService {
         return this._context.loadTime;
     }
 
-    // allgemein mehr kontext
-    // conversion rate   
-    // pfad des mauszeigers evtl.
+    // getAbTest
+
+
+
+    // scopes and configs
+    // generally more context
+    // path of mouse pointer maybe
     
     // done-ish:
-    // mehrere measurements auf einmal
-    // dauer des renderns einer komponente und wie das den kunden beeinflusst
-    // device des users
+    // multiple measurements at once
+    // render duration and how it affects the user
+    // device of user
+    // conversion rate (can probably just calculate based on arrivals vs measurements)
 }

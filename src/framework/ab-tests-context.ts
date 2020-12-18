@@ -1,11 +1,11 @@
 import { AbTimer } from "./ab-timer";
 
 export class AbTestsContext {
-    public timers?: Map<string, AbTimer>;
+    public timers?: Map<string, AbTimer>; //metrics
 
     constructor(
         public version: string,
-        public scope: string,
+        public testName: string,
         public loadTime?: number,
         public deviceType?: string,
         public weight?: number) {
