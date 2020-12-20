@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AbTestsService } from "./ab-tests.service";
 import { AbTestsDirective } from "./ab-tests.directive";
 import { CONFIG } from "./ab-tests-injection-token";
+import { LocalStorageHandler } from "./local-storage-handler";
 
 export interface AbTestsOptions {
     contexts: {
@@ -18,7 +19,7 @@ export interface AbTestsOptions {
     declarations: [ AbTestsDirective ],
     imports: [ CommonModule ],
     exports: [ AbTestsDirective ],
-    providers: [ ],
+    providers: [ LocalStorageHandler ],
 })
 export class AbTestsModule {
     static forRoot(configs: AbTestsOptions[]): ModuleWithProviders<AbTestsModule> {
