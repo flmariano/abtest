@@ -6,11 +6,10 @@ import { AbTestsDirective } from "./ab-tests.directive";
 import { CONFIG } from "./ab-tests-injection-token";
 import { LocalStorageHandler } from "./local-storage-handler";
 
-export interface AbTestsOptions {
-    contexts: {
-      version: string,
-      weight?: number,
-
+export interface AbTestsConfig {
+    versions: {
+      name: string,
+      weight?: number
     }[];
     testName: string;
 }
@@ -22,7 +21,7 @@ export interface AbTestsOptions {
     providers: [ LocalStorageHandler ],
 })
 export class AbTestsModule {
-    static forRoot(configs: AbTestsOptions[]): ModuleWithProviders<AbTestsModule> {
+    static forRoot(configs: AbTestsConfig[]): ModuleWithProviders<AbTestsModule> {
         return {
           ngModule: AbTestsModule,
           providers: [

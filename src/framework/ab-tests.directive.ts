@@ -14,9 +14,9 @@ export class AbTestsDirective {
     ) { }
 
     ngOnInit() {
-        if (this._service.shouldRender(this._versions)) {
+        // if (this._service.shouldRender(this._versions)) {
             this._viewContainer.createEmbeddedView(this._templateRef);
-        }
+        // }
     }
 
     @Input()

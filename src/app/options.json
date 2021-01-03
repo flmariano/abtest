@@ -1,29 +1,29 @@
 [
     {
-      "contexts": [
+      "versions": [
         {
-          "version": "old",
-          "weight": 22
+          "name": "old",
+          "weight": 70
         },
         {
-          "version": "new"
+          "name": "new"
         }
       ],
-      "testName": "v1"
+      "testName": "test1"
     },
     {
-      "contexts": [
+      "versions": [
         {
-          "version": "test1",
+          "name": "v1",
           "weight": 5
         },
         {
-          "version": "test2"
+          "name": "v2"
         },
         {
-          "version": "test3"
+          "name": "v3"
         }
       ],
-      "testName": "v2"
+      "testName": "test2"
     }
 ]

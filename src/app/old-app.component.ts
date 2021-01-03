@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbTestsContext } from 'src/framework/ab-tests-context';
 import { AbTestsService } from 'src/framework/ab-tests.service';
 
@@ -6,7 +6,7 @@ import { AbTestsService } from 'src/framework/ab-tests.service';
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title: string;
   version: string;
   loadTime: string;
@@ -21,35 +21,35 @@ export class AppComponent implements OnInit {
     console.log("AppComponent constructor: " + performance.now() + " ms");
   }
 
-  ngOnInit(): void {
-    let version = this._abService.getVersion();
+  // ngOnInit(): void {
+  //   let version = this._abService.getVersion();
 
-    if (version) {
-      this.title = version;
-    }
-    else {
-      this.title = "getversion doesn't work.";
-    }
+  //   if (version) {
+  //     this.title = version;
+  //   }
+  //   else {
+  //     this.title = "getversion doesn't work.";
+  //   }
 
-    var time = performance.now();
-    console.log("AppComponent ngOnInit: " + time + " ms");
-    // this._abService.setLoadTime(time);
-    // this.loadTime = time.toFixed(0);
+  //   var time = performance.now();
+  //   console.log("AppComponent ngOnInit: " + time + " ms");
+  //   // this._abService.setLoadTime(time);
+  //   // this.loadTime = time.toFixed(0);
 
-    this._abService.startTimer(this.timerName);
+  //   this._abService.startTimer(this.timerName);
 
-    this.context = this._abService.getContextInfo();
-  }
+  //   this.context = this._abService.getContextInfo();
+  // }
 
-  public onClickStart(): void {
-    this._abService.startTimer(this.timerName2);
-    this.running = true;
-  }
+  // public onClickStart(): void {
+  //   this._abService.startTimer(this.timerName2);
+  //   this.running = true;
+  // }
 
-  public onClickStop(): void {
-    this._abService.saveMeasurements([this.timerName, this.timerName2]);
-    this.running = false;
-  }
+  // public onClickStop(): void {
+  //   this._abService.saveMeasurements([this.timerName, this.timerName2]);
+  //   this.running = false;
+  // }
 
   // getTime(): string {
   //   let diff = 0;

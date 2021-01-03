@@ -28,18 +28,18 @@
       TestText old
     </ng-container>
 
-    <ng-container *abTestVersion="2" *ngIf="abTest.scope=='test'">
+    <ng-container *abTestVersion="2">
       TestText new
     </ng-container>
 
   </div>
   
   <div>
-    <ng-container *ngIf="test.version='1'">
+    <ng-container *ngIf="test.version=='1'">
       TestText old
     </ng-container>
 
-    <ng-container *ngIf="test.version='1'">
+    <ng-container *ngIf="test.version=='1'">
       TestText new
     </ng-container>
 

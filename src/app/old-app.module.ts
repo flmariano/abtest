@@ -3,10 +3,10 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './old-app.component';
-import { AbTestsModule, AbTestsOptions } from 'src/framework/ab-tests.module';
+import { AbTestsModule, AbTestsConfig } from 'src/framework/ab-tests.module';
 import options from 'src/app/options.json';
 
-export const abTestsOptions: AbTestsOptions[] = options; 
+export const abTestsOptions: AbTestsConfig[] = options; 
 
 @NgModule({
   declarations: [

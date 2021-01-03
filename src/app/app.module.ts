@@ -15,9 +15,9 @@ import { HeroesComponent } from './heroes/heroes.component';
 import { HeroSearchComponent } from './hero-search/hero-search.component';
 import { MessagesComponent } from './messages/messages.component';
 import options from 'src/app/options.json';
-import { AbTestsModule, AbTestsOptions } from 'src/framework/ab-tests.module';
+import { AbTestsModule, AbTestsConfig } from 'src/framework/ab-tests.module';
 
-export const abTestsOptions: AbTestsOptions[] = options; 
+export const abTestsOptions: AbTestsConfig[] = options; 
 
 @NgModule({
   imports: [
