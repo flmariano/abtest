@@ -28,3 +28,7 @@ button:disabled {
   color: #ccc;
   cursor: auto;
 }
+
+.test {
+  background-color: rgb(141, 255, 112);
+}

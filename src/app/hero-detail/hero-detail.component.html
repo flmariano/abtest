@@ -1,11 +1,17 @@
+<ng-container *ngIf="abTest$ | async as abTest">
+
+<br><div>Version: {{abTest.version}}</div>
+
 <div *ngIf="hero">
   <h2>{{hero.name | uppercase}} Details</h2>
   <div><span>id: </span>{{hero.id}}</div>
   <div>
     <label>name:
-      <input [(ngModel)]="hero.name" placeholder="name"/>
+      <input [ngClass]="{'test': abTest.version == 'new'}" [(ngModel)]="hero.name" placeholder="name"/>
     </label>
   </div>
   <button (click)="goBack()">go back</button>
   <button (click)="save()">save</button>
+  <button *ngIf="abTest.version == 'new'" (click)="save()">extra button</button>
 </div>
+</ng-container>

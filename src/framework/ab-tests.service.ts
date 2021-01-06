@@ -1,11 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
-import { DeviceDetectorService, DeviceType } from "ngx-device-detector";
+import { DeviceDetectorService } from "ngx-device-detector";
 import { AbTest } from "./ab-test";
 import { AbTestsContext } from "./ab-tests-context";
 import { CONFIG } from "./ab-tests-injection-token";
 import { AbTestsConfig } from "./ab-tests.module";
-import { AbTimer } from "./ab-timer";
 import { LocalStorageHandler } from "./local-storage-handler";
 import { uuid } from "./utilities";
 
@@ -15,7 +14,7 @@ const AB_SERVER_URL = "http://localhost:3000/";
 export class AbTestsService {
     private _sessionId: string;
 
-    private _abTests: AbTest[];
+    private _abTests: AbTest[] = [];
 
     constructor(
         @Inject(CONFIG) configs: AbTestsConfig[],
@@ -40,15 +39,24 @@ export class AbTestsService {
     }
 
     save(test: AbTest) {
-
+            //TODO
     }
 
     private generateTests(configs: AbTestsConfig[]): void {
         for (let config of configs) {
-            let ver = this.selectVersion(config);
-            let context = new AbTestsContext(ver, config.testName, this._deviceDetector.deviceType);
-            
-            let test = new AbTest(config.testName, ver, context, config);
+            let testName = config.testName, ver;
+
+            // let storage = this._localStorageHandler.get(testName);
+            let storage = false;
+            if (storage) {
+                ver = storage;
+            } else {
+                ver = this.selectVersion(config);
+                this._localStorageHandler.set(testName, ver);
+            }
+
+            let context = new AbTestsContext(ver, testName, this._deviceDetector.deviceType);
+            let test = new AbTest(testName, ver, context, config);
             this._abTests.push(test);
         }
     }

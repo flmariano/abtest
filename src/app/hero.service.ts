@@ -6,12 +6,16 @@ import { catchError, map, tap } from 'rxjs/operators';
 
 import { Hero } from './hero';
 import { MessageService } from './message.service';
+import { AbTest } from 'src/framework/ab-test';
+import { AbTestsService } from 'src/framework/ab-tests.service';
 
 
 @Injectable({ providedIn: 'root' })
 export class HeroService {
 
   private heroesUrl = 'api/heroes';  // URL to web api
+  private _defaultAbTestName = "test1";
+  private _defaultAbTest = this._abTestsService.getAbTest(this._defaultAbTestName);
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -19,7 +23,12 @@ export class HeroService {
 
   constructor(
     private http: HttpClient,
-    private messageService: MessageService) { }
+    private messageService: MessageService,
+    private _abTestsService: AbTestsService) { }
+
+  getDefaultAbTest(): Observable<AbTest> {
+    return of(this._defaultAbTest);
+  }
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {

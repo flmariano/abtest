@@ -2,8 +2,7 @@
     {
       "versions": [
         {
-          "name": "old",
-          "weight": 70
+          "name": "old"
         },
         {
           "name": "new"
