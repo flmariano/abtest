@@ -1,7 +1,6 @@
 export class AbTestsContext {
     constructor(
-        public version: string,
-        public testName: string,
-        public deviceType: string) {
+        public deviceType: string,
+        public browser?: string) {
         }         
 }

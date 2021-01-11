@@ -9,6 +9,7 @@ import { LocalStorageHandler } from "./local-storage-handler";
 import { uuid } from "./utilities";
 
 const AB_SERVER_URL = "http://localhost:3000/";
+const AB_SERVER_HEADERS = { headers: { "Access-Control-Allow-Origin": "*" } };
 
 @Injectable()
 export class AbTestsService {
@@ -39,7 +40,25 @@ export class AbTestsService {
     }
 
     save(test: AbTest) {
-            //TODO
+        let s = this.serializeTest(test);
+
+        console.log(s);
+
+        // this._httpClient.post(AB_SERVER_URL + "measurements/", s, AB_SERVER_HEADERS).subscribe(
+        //     x => {
+        //         console.log("response: " + x);
+        //     })
+    }
+
+    private serializeTest(test: AbTest): string {
+        return JSON.stringify({
+            sessionId: this._sessionId,
+            testName: test.testName,
+            version: test.version,
+            context: test.context,
+            metrics: test.metrics
+        });
+
     }
 
     private generateTests(configs: AbTestsConfig[]): void {
@@ -55,7 +74,7 @@ export class AbTestsService {
                 this._localStorageHandler.set(testName, ver);
             }
 
-            let context = new AbTestsContext(ver, testName, this._deviceDetector.deviceType);
+            let context = new AbTestsContext(/* ver, testName, */ this._deviceDetector.deviceType);
             let test = new AbTest(testName, ver, context, config);
             this._abTests.push(test);
         }
@@ -106,6 +125,21 @@ export class AbTestsService {
         }
 
         return config.versions[c].name;
+    }
+
+    public sendArrivalData(test: AbTest): void {
+        let body = {
+            sessionId: this._sessionId,
+            testName: test.testName,
+            version: test.version,
+            context: test.context,
+            arrivalTime: Date.now()
+        }
+
+        // this._httpClient.post(AB_SERVER_URL + "arrivals/", body).subscribe(
+        //     x => {
+        //         console.log("response: " + x);
+        //     })
     }
 
     // private _context: AbTestsContext;
@@ -225,21 +259,7 @@ export class AbTestsService {
     //         })
     // }
 
-    // private sendArrivalData(): void {
-    //     let body = {
-    //         sessionId: this._sessionId,
-    //         name: this._context.name,
-    //         testName: this._context.testName,
-    //         loadTime: this._context.loadTime,
-    //         deviceType: this._context.deviceType,
-    //         arrivalTime: Date.now()
-    //     }
 
-    //     this._httpClient.post(AB_SERVER_URL + "arrivals/", body).subscribe(
-    //         x => {
-    //             console.log("response: " + x);
-    //         })
-    // }
 
     // public shouldRender(versions: string[]): boolean {
     //     return versions.indexOf(this._context.name) > -1;

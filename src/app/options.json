@@ -5,7 +5,8 @@
           "name": "old"
         },
         {
-          "name": "new"
+          "name": "new",
+          "weight": 100
         }
       ],
       "testName": "test1"

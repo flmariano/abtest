@@ -43,5 +43,8 @@ export class HeroDetailComponent implements OnInit {
       .subscribe(() => this.goBack());
   }
 
+  test() {
+    this.heroService.saveAbResults();
+  }
 
 }

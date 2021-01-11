@@ -1,11 +1,15 @@
 export type AbTestsMetricType = "timespan" | "conversionRate";
 
 export class AbTestsMetric {
-    public name: string;
-    public type: AbTestsMetricType;
-    public content: string | number;
+    constructor(
+        public name: string,
+        public type: AbTestsMetricType,
+        public content?: string | number
+        ) {
 
-    public serialize(): string {
+    }
+
+    public toString(): string {
         let res = "";
         res = JSON.stringify({
             name: this.name,

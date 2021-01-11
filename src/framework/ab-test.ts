@@ -6,7 +6,7 @@ export class AbTest {
     // public name: string;
     // public version: string;
 
-    public metrics: AbTestsMetric[];
+    public metrics = new Map<string, AbTestsMetric>();
     // public context: AbTestsContext;
     // public config: AbTestsOptions;
 
@@ -16,6 +16,7 @@ export class AbTest {
         public context: AbTestsContext,
         public config: AbTestsConfig
     ) {}
+
 
 
 }

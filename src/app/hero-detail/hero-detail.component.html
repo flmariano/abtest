@@ -12,6 +12,8 @@
   </div>
   <button (click)="goBack()">go back</button>
   <button (click)="save()">save</button>
-  <button *ngIf="abTest.version == 'new'" (click)="save()">extra button</button>
 </div>
+
+<button *ngIf="abTest.version == 'new'" (click)="test()">test</button>
+
 </ng-container>

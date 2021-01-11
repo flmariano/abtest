@@ -8,6 +8,7 @@ import { Hero } from './hero';
 import { MessageService } from './message.service';
 import { AbTest } from 'src/framework/ab-test';
 import { AbTestsService } from 'src/framework/ab-tests.service';
+import { AbTestsMetric } from 'src/framework/ab-tests-metric';
 
 
 @Injectable({ providedIn: 'root' })
@@ -24,10 +25,23 @@ export class HeroService {
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
-    private _abTestsService: AbTestsService) { }
+    private _abTestsService: AbTestsService) {
+      _abTestsService.sendArrivalData(this._defaultAbTest);
+      this.addAbTestMetrics()
+    }
 
   getDefaultAbTest(): Observable<AbTest> {
     return of(this._defaultAbTest);
+  }
+
+  addAbTestMetrics() {
+    this._defaultAbTest.metrics["timeFromStart"] = new AbTestsMetric("timeFromStart", "timespan", performance.now());
+    this._defaultAbTest.metrics["loadTime"] = new AbTestsMetric("time2", "timespan", performance.now());
+  }
+
+  saveAbResults() {
+    this._defaultAbTest.metrics["timeFromStart"].content = performance.now();
+    this._abTestsService.save(this._defaultAbTest);
   }
 
   /** GET heroes from the server */
