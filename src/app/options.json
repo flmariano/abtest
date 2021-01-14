@@ -2,11 +2,11 @@
     {
       "versions": [
         {
-          "name": "old"
+          "name": "button"
         },
         {
-          "name": "new",
-          "weight": 100
+          "name": "enter",
+          "weight": 50
         }
       ],
       "testName": "test1"
@@ -15,10 +15,11 @@
       "versions": [
         {
           "name": "v1",
-          "weight": 5
+          "weight": 33.3333333
         },
         {
-          "name": "v2"
+          "name": "v2",
+          "weight": 5
         },
         {
           "name": "v3"

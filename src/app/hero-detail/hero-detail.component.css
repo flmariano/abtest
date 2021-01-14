@@ -29,6 +29,6 @@ button:disabled {
   cursor: auto;
 }
 
-.test {
-  background-color: rgb(141, 255, 112);
+.makeinvisible {
+  display: none;
 }

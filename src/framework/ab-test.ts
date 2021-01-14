@@ -3,12 +3,8 @@ import { AbTestsMetric } from "./ab-tests-metric";
 import { AbTestsConfig } from "./ab-tests.module";
 
 export class AbTest {
-    // public name: string;
-    // public version: string;
 
     public metrics = new Map<string, AbTestsMetric>();
-    // public context: AbTestsContext;
-    // public config: AbTestsOptions;
 
     constructor(
         public testName: string,
@@ -17,6 +13,10 @@ export class AbTest {
         public config: AbTestsConfig
     ) {}
 
+
+    // addMetric(name: string, ) {
+
+    // }
 
 
 }

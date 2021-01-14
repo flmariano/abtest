@@ -39,15 +39,18 @@ export class AbTestsService {
         return res;
     }
 
-    save(test: AbTest) {
+    save(test: AbTest): string {
         let s = this.serializeTest(test);
 
-        console.log(s);
+        // console.log(s);
 
+        
         // this._httpClient.post(AB_SERVER_URL + "measurements/", s, AB_SERVER_HEADERS).subscribe(
         //     x => {
         //         console.log("response: " + x);
         //     })
+
+        return s;
     }
 
     private serializeTest(test: AbTest): string {
@@ -63,7 +66,8 @@ export class AbTestsService {
 
     private generateTests(configs: AbTestsConfig[]): void {
         for (let config of configs) {
-            let testName = config.testName, ver;
+            let testName = config.testName;
+            let ver = "";
 
             // let storage = this._localStorageHandler.get(testName);
             let storage = false;

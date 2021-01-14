@@ -8,7 +8,7 @@ import { Hero } from './hero';
 import { MessageService } from './message.service';
 import { AbTest } from 'src/framework/ab-test';
 import { AbTestsService } from 'src/framework/ab-tests.service';
-import { AbTestsMetric } from 'src/framework/ab-tests-metric';
+import { AbTestsCounter as AbTestsCount, AbTestsCounter, AbTestsCounterMetric, AbTestsTimespanMetric, MetricType as AbTestsMetricTypes } from 'src/framework/ab-tests-metric';
 
 
 @Injectable({ providedIn: 'root' })
@@ -30,13 +30,47 @@ export class HeroService {
       this.addAbTestMetrics()
     }
 
-  getDefaultAbTest(): Observable<AbTest> {
+  getAbTest(): Observable<AbTest> {
     return of(this._defaultAbTest);
   }
 
   addAbTestMetrics() {
-    this._defaultAbTest.metrics["timeFromStart"] = new AbTestsMetric("timeFromStart", "timespan", performance.now());
-    this._defaultAbTest.metrics["loadTime"] = new AbTestsMetric("time2", "timespan", performance.now());
+    // this._defaultAbTest.metrics["timeFromStart"] = new AbTestsTimespanMetric("timeFromStart", performance.now());
+    // this._defaultAbTest.metrics["loadTime"] = new AbTestsTimespanMetric("loadTime", performance.now());
+    // this._defaultAbTest.metrics["counter1"] = new AbTestsCounterMetric("counter1");
+  }
+
+  addMetric(metricName: string, type: AbTestsMetricTypes) {
+    if(type == "counter") {
+    this._defaultAbTest.metrics[metricName] = new AbTestsCounterMetric(metricName);
+    } else {
+      this._defaultAbTest.metrics[metricName] = new AbTestsTimespanMetric(metricName);
+    }
+  }
+
+  getMetric(metricName: string): AbTestsCounterMetric {
+    return this._defaultAbTest.metrics[metricName];
+  }
+
+  addCount(metricName: string, name?: string) {
+    let m = this._defaultAbTest.metrics[metricName];
+    
+    if (m) {
+      // let prevTimes: AbTestsCounter = m.content[m.content.length - 1];
+
+      // if (prevTimes && prevTimes.timeInterval) {
+      //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now() - prevTimes.timeInterval));
+      // } else {
+      //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
+      // }
+      this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
+    } else {
+      throw Error("no counter of that name");
+    }
+  }
+
+  logAbResults() {
+    console.log(this._abTestsService.save(this._defaultAbTest))
   }
 
   saveAbResults() {

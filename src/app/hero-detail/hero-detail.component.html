@@ -1,19 +1,20 @@
 <ng-container *ngIf="abTest$ | async as abTest">
 
-<br><div>Version: {{abTest.version}}</div>
 
 <div *ngIf="hero">
   <h2>{{hero.name | uppercase}} Details</h2>
   <div><span>id: </span>{{hero.id}}</div>
   <div>
     <label>name:
-      <input [ngClass]="{'test': abTest.version == 'new'}" [(ngModel)]="hero.name" placeholder="name"/>
+      <!-- can only confirm with enter in new version -->
+      <input [ngClass]="{'makeinvisible': abTest.version == 'button'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name" (keyup.enter)="save()"/>
+      <input [ngClass]="{'makeinvisible': abTest.version == 'enter'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name"/>
     </label>
   </div>
   <button (click)="goBack()">go back</button>
-  <button (click)="save()">save</button>
+  <button [ngClass]="{'makeinvisible': abTest.version == 'enter'}" (click)="save()">save</button>
 </div>
 
-<button *ngIf="abTest.version == 'new'" (click)="test()">test</button>
+<!-- <button *ngIf="abTest.version == 'new'" (click)="test()">test</button> -->
 
 </ng-container>

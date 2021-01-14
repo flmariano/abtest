@@ -21,7 +21,7 @@ export class HeroDetailComponent implements OnInit {
     private heroService: HeroService,
     private location: Location
   ) {
-    this.abTest$ = heroService.getDefaultAbTest();
+    this.abTest$ = heroService.getAbTest();
   }
 
   ngOnInit(): void {
@@ -39,12 +39,19 @@ export class HeroDetailComponent implements OnInit {
   }
 
   save(): void {
+    if (!this.heroService.getMetric("saveConfirm")) {
+      this.heroService.addMetric("saveConfirm", "counter");
+    }
+    this.heroService.addCount("saveConfirm", "saving");
+
     this.heroService.updateHero(this.hero)
       .subscribe(() => this.goBack());
-  }
+  } 
 
-  test() {
-    this.heroService.saveAbResults();
+  OnTextBoxFocus() {
+    if (!this.heroService.getMetric("saveConfirm")) {
+      this.heroService.addMetric("saveConfirm", "counter");
+    }
+    this.heroService.addCount("saveConfirm", "focusing");
   }
-
 }
