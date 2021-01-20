@@ -10,18 +10,23 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-hero-detail',
   templateUrl: './hero-detail.component.html',
-  styleUrls: [ './hero-detail.component.css' ]
+  styleUrls: ['./hero-detail.component.css']
 })
 export class HeroDetailComponent implements OnInit {
   hero: Hero;
-  abTest$: Observable<AbTest>;
+  abTests$: Observable<AbTest[]>;
+  abTest: AbTest;
+  private testName = "detailButtonEnter";
 
   constructor(
     private route: ActivatedRoute,
     private heroService: HeroService,
     private location: Location
   ) {
-    this.abTest$ = heroService.getAbTest();
+    this.abTests$ = heroService.getAbTests();
+    this.abTests$.subscribe((r) => {
+      this.abTest = r.find((t) => t.testName === this.testName)
+    })
   }
 
   ngOnInit(): void {
@@ -39,19 +44,19 @@ export class HeroDetailComponent implements OnInit {
   }
 
   save(): void {
-    if (!this.heroService.getMetric("saveConfirm")) {
-      this.heroService.addMetric("saveConfirm", "counter");
+    if (!this.heroService.getMetric(this.testName,"saveConfirm")) {
+      this.heroService.addMetric(this.testName,"saveConfirm", "counter");
     }
-    this.heroService.addCount("saveConfirm", "saving");
+    this.heroService.addCount(this.testName,"saveConfirm", "saving");
 
     this.heroService.updateHero(this.hero)
       .subscribe(() => this.goBack());
-  } 
+  }
 
   OnTextBoxFocus() {
-    if (!this.heroService.getMetric("saveConfirm")) {
-      this.heroService.addMetric("saveConfirm", "counter");
+    if (!this.heroService.getMetric(this.testName,"saveConfirm")) {
+      this.heroService.addMetric(this.testName,"saveConfirm", "counter");
     }
-    this.heroService.addCount("saveConfirm", "focusing");
+    this.heroService.addCount(this.testName,"saveConfirm", "focusing");
   }
 }

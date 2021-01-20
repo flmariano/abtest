@@ -10,6 +10,8 @@ import { AbTest } from 'src/framework/ab-test';
 import { AbTestsService } from 'src/framework/ab-tests.service';
 import { AbTestsCount, AbTestsCounterMetric, MetricType } from 'src/framework/ab-tests-metric';
 
+const AB_TEST_NAMES = ["detailButtonEnter", "addButtonPos"];
+
 
 @Injectable({ providedIn: 'root' })
 export class HeroService {
@@ -27,8 +29,8 @@ export class HeroService {
     { id: 20, name: 'Tornado' }
   ];
 
-  private _defaultAbTestName = "test1";
-  private _defaultAbTest = this._abTestsService.getAbTest(this._defaultAbTestName);
+  private _abTests: AbTest[] = [];
+  // private _defaultAbTest = this._abTestsService.getAbTest(this._defaultAbTestName);
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -38,31 +40,52 @@ export class HeroService {
     private http: HttpClient,
     private messageService: MessageService,
     private _abTestsService: AbTestsService) {
-      _abTestsService.sendArrivalData(this._defaultAbTest);
+      for (let n of AB_TEST_NAMES) {
+        let t = this._abTestsService.getAbTest(n);
+
+        if (t) {
+          this._abTests.push(t);
+        }
+      }
+      // _abTestsService.sendArrivalData(this._defaultAbTest);
     }
 
-  getAbTest(): Observable<AbTest> {
-    return of(this._defaultAbTest);
+  getAbTests(): Observable<AbTest[]> {
+    return of(this._abTests);
   }
 
-  addMetric(metricName: string, type: MetricType) {
-    this._defaultAbTest.addMetric(metricName, type);
+  addMetric(testName: string, metricName: string, type: MetricType) {
+    for (let i in this._abTests) {
+      if (this._abTests[i].testName == testName) {
+        this._abTests[i].addMetric(metricName, type)
+      }
+    }
   }
 
-  getMetric(metricName: string): AbTestsCounterMetric {
-    return this._defaultAbTest.getMetric(metricName);
+  getMetric(testName: string, metricName: string): AbTestsCounterMetric {
+    for (let i in this._abTests) {
+      if (this._abTests[i].testName == testName) {
+        return this._abTests[i].getMetric(metricName)
+      }
+    }
   }
 
-  addCount(metricName: string, name?: string) {
-    this._defaultAbTest.addCount(metricName, name);
+  addCount(testName: string, metricName: string, name?: string) {
+    for (let i in this._abTests) {
+      if (this._abTests[i].testName == testName) {
+        this._abTests[i].addCount(metricName, name)
+      }
+    }
   }
 
   logAbResults() {
-    console.log(this._abTestsService.save(this._defaultAbTest))
+    for (let t in this._abTests) {
+      console.log(this._abTestsService.save(this._abTests[t]))
+    }
   }
 
   saveAbResults() {
-    this._abTestsService.save(this._defaultAbTest);
+    // this._abTestsService.save(this._defaultAbTest);
   }
 
   /** GET heroes from the server */
@@ -106,10 +129,8 @@ export class HeroService {
     this.heroes.push(h);
     return of(h);
   }
-  private generateId() {
-    return this.heroes.length > 0 ? Math.max(...this.heroes.map(hero => hero.id)) + 1 : 11;
-  }
 
+  
   /** DELETE: delete the hero from the server */
   deleteHero(hero: Hero | number): Observable<Hero> {
     const id = typeof hero === 'number' ? hero : hero.id;
@@ -127,10 +148,14 @@ export class HeroService {
       if (h.id === hero.id) return h;
     })
     if (r) {
-      this.heroes.reduce((p, c, i, arr) => {
-        if(c.id !== r.id) return c;
-        else return r;
-      })
+      for(let i in this.heroes) {
+        if(this.heroes[i].id === r.id) this.heroes[i] = r;
+      }
+
+      // this.heroes.reduce((p, c, i, arr) => {
+      //   if(c.id !== r.id) return c;
+      //   else return r;
+      // })
     }
 
     return of(hero);
@@ -160,4 +185,9 @@ export class HeroService {
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`);
   }
+
+  private generateId() {
+    return this.heroes.length > 0 ? Math.max(...this.heroes.map(hero => hero.id)) + 1 : 11;
+  }
+
 }

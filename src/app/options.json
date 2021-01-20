@@ -9,22 +9,20 @@
           "weight": 50
         }
       ],
-      "testName": "test1"
+      "testName": "detailButtonEnter"
     },
     {
       "versions": [
         {
-          "name": "v1",
-          "weight": 33.3333333
+          "name": "right"
         },
         {
-          "name": "v2",
-          "weight": 5
+          "name": "below"
         },
         {
-          "name": "v3"
+          "name": "enter"
         }
       ],
-      "testName": "test2"
+      "testName": "addButtonPos"
     }
 ]

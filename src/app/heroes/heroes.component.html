@@ -1,11 +1,15 @@
+<ng-container *ngIf="abTests$ | async as abTests">
+
 <h2>My Heroes</h2>
 
 <div>
   <label>Hero name:
-    <input #heroName />
+    <input [ngClass]="{'makeInvisible': abTest.version == 'enter'}" #heroName />
+    <input [ngClass]="{'makeInvisible': abTest.version !== 'enter'}" (keyup.enter)="add(heroName2.value); heroName2.value=''" #heroName2 />
   </label>
   <!-- (click) passes input value to add() and then clears the input -->
-  <button (click)="add(heroName.value); heroName.value=''">
+  <br *ngIf="abTest.version == 'below'">
+  <button [ngClass]="{'makeInvisible': abTest.version == 'enter'}" (click)="add(heroName.value); heroName.value=''">
     add
   </button>
 </div>
@@ -19,3 +23,5 @@
       (click)="delete(hero)">x</button>
   </li>
 </ul>
+
+</ng-container>

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AbTest } from 'src/framework/ab-test';
 
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
@@ -10,12 +12,19 @@ import { HeroService } from '../hero.service';
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
+  abTests$: Observable<AbTest[]>;
+  abTest: AbTest;
 
-  constructor(private heroService: HeroService) { }
+  constructor(private heroService: HeroService) {
+    this.abTests$ = this.heroService.getAbTests();
+    this.abTests$.subscribe((r) => {
+      this.abTest = r.find((t) => t.testName === "addButtonPos")
+    })
+  }
 
   ngOnInit() {
     this.getHeroes();
-  }
+  } 
 
   getHeroes(): void {
     this.heroService.getHeroes()

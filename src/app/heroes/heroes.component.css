@@ -71,3 +71,6 @@ button.delete {
   color: white;
 }
 
+.makeInvisible {
+  display: none;
+}

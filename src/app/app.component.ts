@@ -10,10 +10,16 @@ import { HeroService } from './hero.service';
 })
 export class AppComponent {
   title = 'Tour of Heroes';
-  abTest$: Observable<AbTest>;
+  abTests$: Observable<AbTest[]>;
+  abTest1: AbTest;
+  abTest2: AbTest;
 
   constructor(private _heroService: HeroService) {
-    this.abTest$ = _heroService.getAbTest();
+    this.abTests$ = _heroService.getAbTests();
+    this.abTests$.subscribe((r) => {
+      this.abTest1 = r.find((t) => t.testName === "detailButtonEnter")
+      this.abTest2 = r.find((t) => t.testName === "addButtonPos")
+    })
   }
 
   logAbTest() {

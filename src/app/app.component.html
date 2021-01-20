@@ -5,8 +5,9 @@
   <a routerLink="/heroes">Heroes</a>
 </nav>
 
-<ng-container *ngIf="abTest$ | async as abTest">
-  <br><div>Version: {{abTest.version}}</div>
+<ng-container *ngIf="abTests$ | async as abTests">
+  <br><div>Version test 1: {{abTest1.version}}</div>
+  <div>Version test 2: {{abTest2.version}}</div>
 
   <button (click)="logAbTest()">Log A/B Test</button>
 </ng-container>
