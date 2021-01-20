@@ -59,7 +59,7 @@ export class AbTestsService {
             testName: test.testName,
             version: test.version,
             context: test.context,
-            metrics: test.metrics
+            metrics: test.getMetrics()
         });
 
     }

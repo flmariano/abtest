@@ -31,7 +31,7 @@ export class AbTestsTimespanMetric extends AbTestsMetric {
 }
 
 export class AbTestsCounterMetric extends AbTestsMetric {
-    public content: AbTestsCounter[] = [];
+    public content: AbTestsCount[] = [];
 
     constructor(public name: string) {
         super(name);
@@ -45,12 +45,13 @@ export class AbTestsCounterMetric extends AbTestsMetric {
     }
 
     public addCount(name?: string, timeInterval?: number) {
-        let c = new AbTestsCounter(name, timeInterval);
+        let c = new AbTestsCount(name, timeInterval);
         return this.content.push(c);
     }
 }
 
-export class AbTestsCounter {
+export class AbTestsCount
+{
     public name: string = "";
     public timeInterval: number = 0;
 

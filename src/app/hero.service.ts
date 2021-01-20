@@ -8,13 +8,25 @@ import { Hero } from './hero';
 import { MessageService } from './message.service';
 import { AbTest } from 'src/framework/ab-test';
 import { AbTestsService } from 'src/framework/ab-tests.service';
-import { AbTestsCounter as AbTestsCount, AbTestsCounter, AbTestsCounterMetric, AbTestsTimespanMetric, MetricType as AbTestsMetricTypes } from 'src/framework/ab-tests-metric';
+import { AbTestsCount, AbTestsCounterMetric, MetricType } from 'src/framework/ab-tests-metric';
 
 
 @Injectable({ providedIn: 'root' })
 export class HeroService {
 
-  private heroesUrl = 'api/heroes';  // URL to web api
+  private heroes: Hero[] = [
+    { id: 11, name: 'Dr Nice' },
+    { id: 12, name: 'Narco' },
+    { id: 13, name: 'Bombasto' },
+    { id: 14, name: 'Celeritas' },
+    { id: 15, name: 'Magneta' },
+    { id: 16, name: 'RubberMan' },
+    { id: 17, name: 'Dynama' },
+    { id: 18, name: 'Dr IQ' },
+    { id: 19, name: 'Magma' },
+    { id: 20, name: 'Tornado' }
+  ];
+
   private _defaultAbTestName = "test1";
   private _defaultAbTest = this._abTestsService.getAbTest(this._defaultAbTestName);
 
@@ -27,46 +39,22 @@ export class HeroService {
     private messageService: MessageService,
     private _abTestsService: AbTestsService) {
       _abTestsService.sendArrivalData(this._defaultAbTest);
-      this.addAbTestMetrics()
     }
 
   getAbTest(): Observable<AbTest> {
     return of(this._defaultAbTest);
   }
 
-  addAbTestMetrics() {
-    // this._defaultAbTest.metrics["timeFromStart"] = new AbTestsTimespanMetric("timeFromStart", performance.now());
-    // this._defaultAbTest.metrics["loadTime"] = new AbTestsTimespanMetric("loadTime", performance.now());
-    // this._defaultAbTest.metrics["counter1"] = new AbTestsCounterMetric("counter1");
-  }
-
-  addMetric(metricName: string, type: AbTestsMetricTypes) {
-    if(type == "counter") {
-    this._defaultAbTest.metrics[metricName] = new AbTestsCounterMetric(metricName);
-    } else {
-      this._defaultAbTest.metrics[metricName] = new AbTestsTimespanMetric(metricName);
-    }
+  addMetric(metricName: string, type: MetricType) {
+    this._defaultAbTest.addMetric(metricName, type);
   }
 
   getMetric(metricName: string): AbTestsCounterMetric {
-    return this._defaultAbTest.metrics[metricName];
+    return this._defaultAbTest.getMetric(metricName);
   }
 
   addCount(metricName: string, name?: string) {
-    let m = this._defaultAbTest.metrics[metricName];
-    
-    if (m) {
-      // let prevTimes: AbTestsCounter = m.content[m.content.length - 1];
-
-      // if (prevTimes && prevTimes.timeInterval) {
-      //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now() - prevTimes.timeInterval));
-      // } else {
-      //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
-      // }
-      this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
-    } else {
-      throw Error("no counter of that name");
-    }
+    this._defaultAbTest.addCount(metricName, name);
   }
 
   logAbResults() {
@@ -74,40 +62,25 @@ export class HeroService {
   }
 
   saveAbResults() {
-    this._defaultAbTest.metrics["timeFromStart"].content = performance.now();
     this._abTestsService.save(this._defaultAbTest);
   }
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
-      .pipe(
-        tap(_ => this.log('fetched heroes')),
-        catchError(this.handleError<Hero[]>('getHeroes', []))
-      );
+    return of(this.heroes);
   }
 
   /** GET hero by id. Return `undefined` when id not found */
   getHeroNo404<Data>(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/?id=${id}`;
-    return this.http.get<Hero[]>(url)
-      .pipe(
-        map(heroes => heroes[0]), // returns a {0|1} element array
-        tap(h => {
-          const outcome = h ? `fetched` : `did not find`;
-          this.log(`${outcome} hero id=${id}`);
-        }),
-        catchError(this.handleError<Hero>(`getHero id=${id}`))
-      );
+    let r = this.heroes.find((h) => {
+      if(h.id == id) return h;
+    })
+    return of(r);
   }
 
   /** GET hero by id. Will 404 if id not found */
   getHero(id: number): Observable<Hero> {
-    const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
-      tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
-    );
+    return this.getHeroNo404(id)
   }
 
   /* GET heroes whose name contains search term */
@@ -116,41 +89,51 @@ export class HeroService {
       // if not search term, return empty hero array.
       return of([]);
     }
-    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
-      tap(x => x.length ?
-         this.log(`found heroes matching "${term}"`) :
-         this.log(`no heroes matching "${term}"`)),
-      catchError(this.handleError<Hero[]>('searchHeroes', []))
-    );
+    return of(this.heroes.filter((h) => {
+      if (h.name.toLowerCase().includes(term)) return h;
+    }))
   }
 
   //////// Save methods //////////
 
   /** POST: add a new hero to the server */
   addHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
-      catchError(this.handleError<Hero>('addHero'))
-    );
+    let h = {
+      id: this.generateId(),
+      name: hero.name
+    }
+
+    this.heroes.push(h);
+    return of(h);
+  }
+  private generateId() {
+    return this.heroes.length > 0 ? Math.max(...this.heroes.map(hero => hero.id)) + 1 : 11;
   }
 
   /** DELETE: delete the hero from the server */
   deleteHero(hero: Hero | number): Observable<Hero> {
     const id = typeof hero === 'number' ? hero : hero.id;
-    const url = `${this.heroesUrl}/${id}`;
+    
+    this.heroes = this.heroes.filter((h) => {
+      if(h.id !== id) return h;
+    })
 
-    return this.http.delete<Hero>(url, this.httpOptions).pipe(
-      tap(_ => this.log(`deleted hero id=${id}`)),
-      catchError(this.handleError<Hero>('deleteHero'))
-    );
+    return of();
   }
 
   /** PUT: update the hero on the server */
   updateHero(hero: Hero): Observable<any> {
-    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
-      tap(_ => this.log(`updated hero id=${hero.id}`)),
-      catchError(this.handleError<any>('updateHero'))
-    );
+    let r = this.heroes.find((h) => {
+      if (h.id === hero.id) return h;
+    })
+    if (r) {
+      this.heroes.reduce((p, c, i, arr) => {
+        if(c.id !== r.id) return c;
+        else return r;
+      })
+    }
+
+    return of(hero);
   }
 
   /**
