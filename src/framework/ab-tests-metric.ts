@@ -2,7 +2,6 @@ export type MetricType = "timespan" | "counter";
  
 export class AbTestsMetric {
     public context = new Map<string, any>();
-    public content: any;
 
     constructor(public name: string) { }
 
@@ -13,53 +12,35 @@ export class AbTestsMetric {
 }
 
 export class AbTestsTimespanMetric extends AbTestsMetric {
-    public content: number;
+    public time: number;
 
     constructor(public name: string, content?: number) {
         super(name);
 
-        this.content = content ? content : 0;
+        this.time = content ? content : 0;
     }
 
     public toJSON(): object {
         return {
-            name: this.name,
-            context: this.context,
-            content: this.content
+            // name: this.name,
+            // context: this.context,
+            time: this.time
         }
     }
 }
 
 export class AbTestsCounterMetric extends AbTestsMetric {
-    public content: AbTestsCount[] = [];
+    public count: number;
 
-    constructor(public name: string) {
+    constructor(public name: string, count?: number) {
         super(name);
+        this.count = count ? count : 0;
     }
 
     public toJSON(): object {
         return {
-            name: this.name,
-            content: this.content
+            // name: this.name,
+            count: this.count
         }
-    }
-
-    public addCount(name?: string, timeInterval?: number) {
-        let c = new AbTestsCount(name, timeInterval);
-        return this.content.push(c);
-    }
-}
-
-export class AbTestsCount
-{
-    public name: string = "";
-    public timeInterval: number = 0;
-
-    constructor(
-        name?: string,
-        timeInterval?: number
-    ) {
-        this.name = name ? name : "";
-        this.timeInterval = timeInterval ? timeInterval : 0;
     }
 }

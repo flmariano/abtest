@@ -6,8 +6,8 @@
 </nav>
 
 <ng-container *ngIf="abTests$ | async as abTests">
-  <br><div>Version test 1: {{abTest1.version}}</div>
-  <div>Version test 2: {{abTest2.version}}</div>
+  <br><div>Version of detailButtonEnter: {{abTest1.version}}</div>
+  <div>Version of addButtonPos: {{abTest2.version}}</div>
 
   <button (click)="logAbTest()">Log A/B Test</button>
 </ng-container>

@@ -7,8 +7,8 @@
   <div>
     <label>name:
       <!-- can only confirm with enter in new version -->
-      <input [ngClass]="{'makeinvisible': abTest.version == 'button'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name" (keyup.enter)="save()"/>
-      <input [ngClass]="{'makeinvisible': abTest.version == 'enter'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name"/>
+      <input [ngClass]="{'makeinvisible': abTest.version == 'button'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name" (keyup.enter)="save()" (keydown)="OnTextBoxKeyDown($event)"/>
+      <input [ngClass]="{'makeinvisible': abTest.version == 'enter'}" (focus)="OnTextBoxFocus()" [(ngModel)]="hero.name" placeholder="name" (keydown)="OnTextBoxKeyDown($event)"/>
     </label>
   </div>
   <button (click)="goBack()">go back</button>

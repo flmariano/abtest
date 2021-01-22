@@ -1,5 +1,5 @@
 import { AbTestsContext } from "./ab-tests-context";
-import { AbTestsCount, AbTestsCounterMetric, AbTestsMetric, AbTestsTimespanMetric, MetricType } from "./ab-tests-metric";
+import { AbTestsCounterMetric, AbTestsMetric, AbTestsTimespanMetric, MetricType } from "./ab-tests-metric";
 import { AbTestsConfig } from "./ab-tests.module";
 
 export class AbTest {
@@ -14,11 +14,13 @@ export class AbTest {
     ) { }
 
 
-    addMetric(metricName: string, type: MetricType) {
-        if (type == "counter") {
-            this.metrics[metricName] = new AbTestsCounterMetric(metricName);
+    addMetric(metricName: string, type: MetricType, content: number) {
+        if (type === "counter") {
+            this.metrics[metricName] = new AbTestsCounterMetric(metricName, Math.round(content));
+        } else if (type === "timespan") {
+            this.metrics[metricName] = new AbTestsTimespanMetric(metricName, Math.round(content));
         } else {
-            this.metrics[metricName] = new AbTestsTimespanMetric(metricName);
+            throw Error("metric type doesn't exist.");
         }
     }
 
@@ -30,18 +32,11 @@ export class AbTest {
         return this.metrics;
     }
 
-    addCount(metricName: string, name?: string) {
+    incrementCounter(metricName: string) {
         let m = this.metrics[metricName];
 
         if (m) {
-            // let prevTimes: AbTestsCounter = m.content[m.content.length - 1];
-
-            // if (prevTimes && prevTimes.timeInterval) {
-            //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now() - prevTimes.timeInterval));
-            // } else {
-            //   this._defaultAbTest.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
-            // }
-            this.metrics[metricName].content.push(new AbTestsCount(name ? name : undefined, performance.now()));
+            this.metrics[metricName].content += 1;
         } else {
             throw Error("no counter of that name");
         }

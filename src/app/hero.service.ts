@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
 
 import { Hero } from './hero';
 import { MessageService } from './message.service';
 import { AbTest } from 'src/framework/ab-test';
 import { AbTestsService } from 'src/framework/ab-tests.service';
-import { AbTestsCount, AbTestsCounterMetric, MetricType } from 'src/framework/ab-tests-metric';
+import { AbTestsCounterMetric, MetricType } from 'src/framework/ab-tests-metric';
 
 const AB_TEST_NAMES = ["detailButtonEnter", "addButtonPos"];
 
@@ -30,34 +29,32 @@ export class HeroService {
   ];
 
   private _abTests: AbTest[] = [];
-  // private _defaultAbTest = this._abTestsService.getAbTest(this._defaultAbTestName);
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
   constructor(
-    private http: HttpClient,
     private messageService: MessageService,
     private _abTestsService: AbTestsService) {
-      for (let n of AB_TEST_NAMES) {
-        let t = this._abTestsService.getAbTest(n);
+    for (let n of AB_TEST_NAMES) {
+      let t = this._abTestsService.getAbTest(n);
 
-        if (t) {
-          this._abTests.push(t);
-        }
+      if (t) {
+        this._abTests.push(t);
       }
-      // _abTestsService.sendArrivalData(this._defaultAbTest);
     }
+    this._abTestsService.sendArrivalData(this._abTests);
+  }
 
   getAbTests(): Observable<AbTest[]> {
     return of(this._abTests);
   }
 
-  addMetric(testName: string, metricName: string, type: MetricType) {
+  addMetric(testName: string, metricName: string, type: MetricType, content: number) {
     for (let i in this._abTests) {
       if (this._abTests[i].testName == testName) {
-        this._abTests[i].addMetric(metricName, type)
+        this._abTests[i].addMetric(metricName, type, content);
       }
     }
   }
@@ -70,22 +67,30 @@ export class HeroService {
     }
   }
 
-  addCount(testName: string, metricName: string, name?: string) {
+  incrementCounter(testName: string, metricName: string) {
     for (let i in this._abTests) {
       if (this._abTests[i].testName == testName) {
-        this._abTests[i].addCount(metricName, name)
+        this._abTests[i].incrementCounter(metricName);
       }
     }
   }
 
-  logAbResults() {
-    for (let t in this._abTests) {
-      console.log(this._abTestsService.save(this._abTests[t]))
-    }
+  logAbResults() { // also sends
+    console.log(this._abTestsService.save(this._abTests))
   }
 
-  saveAbResults() {
-    // this._abTestsService.save(this._defaultAbTest);
+  saveAbResults(testNames?: string[]) {
+    // sends all if abTests unspecified
+
+    let tests: AbTest[] = [];
+    if (testNames) {
+      for (const testName of testNames) {
+        tests.push(this._abTests.find((t) => {
+          if (t.testName === testName) return t
+        }))
+      }
+    }
+    this._abTestsService.save(tests.length > 0 ? tests : this._abTests);
   }
 
   /** GET heroes from the server */
@@ -94,9 +99,9 @@ export class HeroService {
   }
 
   /** GET hero by id. Return `undefined` when id not found */
-  getHeroNo404<Data>(id: number): Observable<Hero> {
+  getHeroNo404(id: number): Observable<Hero> {
     let r = this.heroes.find((h) => {
-      if(h.id == id) return h;
+      if (h.id == id) return h;
     })
     return of(r);
   }
@@ -130,13 +135,13 @@ export class HeroService {
     return of(h);
   }
 
-  
+
   /** DELETE: delete the hero from the server */
   deleteHero(hero: Hero | number): Observable<Hero> {
     const id = typeof hero === 'number' ? hero : hero.id;
-    
+
     this.heroes = this.heroes.filter((h) => {
-      if(h.id !== id) return h;
+      if (h.id !== id) return h;
     })
 
     return of();
@@ -148,8 +153,8 @@ export class HeroService {
       if (h.id === hero.id) return h;
     })
     if (r) {
-      for(let i in this.heroes) {
-        if(this.heroes[i].id === r.id) this.heroes[i] = r;
+      for (let i in this.heroes) {
+        if (this.heroes[i].id === r.id) this.heroes[i] = r;
       }
 
       // this.heroes.reduce((p, c, i, arr) => {
@@ -161,25 +166,6 @@ export class HeroService {
     return of(hero);
   }
 
-  /**
-   * Handle Http operation that failed.
-   * Let the app continue.
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
-   */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      this.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
-  }
 
   /** Log a HeroService message with the MessageService */
   private log(message: string) {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Event } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { Hero } from '../hero';
@@ -16,7 +16,9 @@ export class HeroDetailComponent implements OnInit {
   hero: Hero;
   abTests$: Observable<AbTest[]>;
   abTest: AbTest;
-  private testName = "detailButtonEnter";
+  private _testName = "detailButtonEnter";
+  private _lastKeyPress = 0;
+  private _timeClickedOn: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,12 +27,13 @@ export class HeroDetailComponent implements OnInit {
   ) {
     this.abTests$ = heroService.getAbTests();
     this.abTests$.subscribe((r) => {
-      this.abTest = r.find((t) => t.testName === this.testName)
+      this.abTest = r.find((t) => t.testName === this._testName)
     })
   }
 
   ngOnInit(): void {
     this.getHero();
+    this._timeClickedOn = performance.now();
   }
 
   getHero(): void {
@@ -40,23 +43,32 @@ export class HeroDetailComponent implements OnInit {
   }
 
   goBack(): void {
+    this.heroService.addMetric(this._testName, "lastKeyPress", "timespan", this._lastKeyPress - this._timeClickedOn);
+
+    this.heroService.saveAbResults(["detailButtonEnter"]);
     this.location.back();
   }
 
   save(): void {
-    if (!this.heroService.getMetric(this.testName,"saveConfirm")) {
-      this.heroService.addMetric(this.testName,"saveConfirm", "counter");
-    }
-    this.heroService.addCount(this.testName,"saveConfirm", "saving");
+    this.heroService.addMetric(this._testName, "saving", "timespan", performance.now() - this._timeClickedOn);
 
     this.heroService.updateHero(this.hero)
       .subscribe(() => this.goBack());
   }
 
   OnTextBoxFocus() {
-    if (!this.heroService.getMetric(this.testName,"saveConfirm")) {
-      this.heroService.addMetric(this.testName,"saveConfirm", "counter");
+    this.heroService.addMetric(this._testName, "focusing", "timespan", performance.now() - this._timeClickedOn);
+  }
+
+  OnTextBoxKeyDown(event: KeyboardEvent) {
+    if (event.key.toLowerCase() !== "enter") {
+      this._lastKeyPress = performance.now();
+    } else {
+      if (this.heroService.getMetric(this._testName, "enterPresses")) {
+        this.heroService.incrementCounter(this._testName, "enterPresses")
+      } else {
+        this.heroService.addMetric(this._testName, "enterPresses", "counter", 1);
+      }
     }
-    this.heroService.addCount(this.testName,"saveConfirm", "focusing");
   }
 }

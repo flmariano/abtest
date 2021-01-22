@@ -9,7 +9,7 @@ import { LocalStorageHandler } from "./local-storage-handler";
 import { uuid } from "./utilities";
 
 const AB_SERVER_URL = "http://localhost:3000/";
-const AB_SERVER_HEADERS = { headers: { "Access-Control-Allow-Origin": "*" } };
+const AB_SERVER_HEADERS = { headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" } };
 
 @Injectable()
 export class AbTestsService {
@@ -39,18 +39,32 @@ export class AbTestsService {
         return res;
     }
 
-    save(test: AbTest): string {
-        let s = this.serializeTest(test);
+    save(tests: AbTest[], arrival?: boolean): string {
+        let r = "[";
+        for (const test of tests) {
+            let s = this.serializeTest(test);
+            if (r.length > 1) {
+                r = r + ", " + s;
+            } else {
+                r = r + s;
+            }
+        }
+        r = r + "]";
 
-        // console.log(s);
+        this._httpClient.post(AB_SERVER_URL + (arrival ? "arrivals/" : "measurements/"), r, AB_SERVER_HEADERS).subscribe(
+            x => {
+                if (arrival) {
+                    console.log("Arrival sent. Response: " + JSON.stringify(x));
+                } else {
+                    console.log("Measurements sent. Response: " + JSON.stringify(x));
+                }
+            })
 
-        
-        // this._httpClient.post(AB_SERVER_URL + "measurements/", s, AB_SERVER_HEADERS).subscribe(
-        //     x => {
-        //         console.log("response: " + x);
-        //     })
+        return r;
+    }
 
-        return s;
+    public sendArrivalData(tests: AbTest[]): void {
+        this.save(tests, true);
     }
 
     private serializeTest(test: AbTest): string {
@@ -59,7 +73,8 @@ export class AbTestsService {
             testName: test.testName,
             version: test.version,
             context: test.context,
-            metrics: test.getMetrics()
+            metrics: test.getMetrics(),
+            currentTime: Date.now()
         });
 
     }
@@ -131,20 +146,7 @@ export class AbTestsService {
         return config.versions[c].name;
     }
 
-    public sendArrivalData(test: AbTest): void {
-        let body = {
-            sessionId: this._sessionId,
-            testName: test.testName,
-            version: test.version,
-            context: test.context,
-            arrivalTime: Date.now()
-        }
 
-        // this._httpClient.post(AB_SERVER_URL + "arrivals/", body).subscribe(
-        //     x => {
-        //         console.log("response: " + x);
-        //     })
-    }
 
     // private _context: AbTestsContext;
 
