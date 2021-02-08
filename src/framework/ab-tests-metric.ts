@@ -24,6 +24,7 @@ export class AbTestsTimespanMetric extends AbTestsMetric {
         return {
             // name: this.name,
             // context: this.context,
+            type: "timespan",
             time: this.time
         }
     }
@@ -40,6 +41,7 @@ export class AbTestsCounterMetric extends AbTestsMetric {
     public toJSON(): object {
         return {
             // name: this.name,
+            type: "counter",
             count: this.count
         }
     }

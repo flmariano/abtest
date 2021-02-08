@@ -5,12 +5,10 @@
   <a routerLink="/heroes">Heroes</a>
 </nav>
 
-<ng-container *ngIf="abTests$ | async as abTests">
   <br><div>Version of detailButtonEnter: {{abTest1.version}}</div>
   <div>Version of addButtonPos: {{abTest2.version}}</div>
 
-  <button (click)="logAbTest()">Log A/B Test</button>
-</ng-container>
+  <!-- <button (click)="logAbTest()">Log A/B Test</button> -->
 
 <router-outlet></router-outlet>
 <app-messages></app-messages>

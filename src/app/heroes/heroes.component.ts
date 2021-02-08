@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AbTest } from 'src/framework/ab-test';
+import { AbTestsService } from 'src/framework/ab-tests.service';
 
 import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
@@ -12,14 +13,11 @@ import { HeroService } from '../hero.service';
 })
 export class HeroesComponent implements OnInit {
   heroes: Hero[];
-  abTests$: Observable<AbTest[]>;
   abTest: AbTest;
 
-  constructor(private heroService: HeroService) {
-    this.abTests$ = this.heroService.getAbTests();
-    this.abTests$.subscribe((r) => {
-      this.abTest = r.find((t) => t.testName === "addButtonPos")
-    })
+  constructor(private _abService: AbTestsService,
+    private _heroService: HeroService) {
+    this.abTest = _abService.getAbTest("detailButtonEnter");
   }
 
   ngOnInit() {
@@ -27,14 +25,14 @@ export class HeroesComponent implements OnInit {
   } 
 
   getHeroes(): void {
-    this.heroService.getHeroes()
+    this._heroService.getHeroes()
     .subscribe(heroes => this.heroes = heroes);
   }
 
   add(name: string): void {
     name = name.trim();
     if (!name) { return; }
-    this.heroService.addHero({ name } as Hero)
+    this._heroService.addHero({ name } as Hero)
       .subscribe(/* hero => {
         this.heroes.push(hero);
       } */);
@@ -42,7 +40,7 @@ export class HeroesComponent implements OnInit {
 
   delete(hero: Hero): void {
     this.heroes = this.heroes.filter(h => h !== hero);
-    this.heroService.deleteHero(hero).subscribe();
+    this._heroService.deleteHero(hero).subscribe();
   }
 
 }

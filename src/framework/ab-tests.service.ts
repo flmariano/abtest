@@ -17,6 +17,7 @@ export class AbTestsService {
 
     private _abTests: AbTest[] = [];
 
+    // define provider to inject for input from server (user can make their own provider but there's a default (one for loading and one for saving each)) and customization
     constructor(
         @Inject(CONFIG) configs: AbTestsConfig[],
         private _localStorageHandler: LocalStorageHandler,

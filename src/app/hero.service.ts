@@ -28,7 +28,7 @@ export class HeroService {
     { id: 20, name: 'Tornado' }
   ];
 
-  private _abTests: AbTest[] = [];
+  // private _abTests: AbTest[] = []; // remove, put in components
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -37,61 +37,63 @@ export class HeroService {
   constructor(
     private messageService: MessageService,
     private _abTestsService: AbTestsService) {
-    for (let n of AB_TEST_NAMES) {
-      let t = this._abTestsService.getAbTest(n);
+    // for (let n of AB_TEST_NAMES) {
+    //   let t = this._abTestsService.getAbTest(n);
 
-      if (t) {
-        this._abTests.push(t);
-      }
-    }
-    this._abTestsService.sendArrivalData(this._abTests);
+    //   if (t) {
+    //     this._abTests.push(t);
+    //   }
+    // }
+    // this._abTestsService.sendArrivalData(this._abTests);
   }
 
-  getAbTests(): Observable<AbTest[]> {
-    return of(this._abTests);
-  }
+  // getAbTests(): Observable<AbTest[]> {
+  //   return of(this._abTests);
+  // }
 
-  addMetric(testName: string, metricName: string, type: MetricType, content: number) {
-    for (let i in this._abTests) {
-      if (this._abTests[i].testName == testName) {
-        this._abTests[i].addMetric(metricName, type, content);
-      }
-    }
-  }
+  // addMetric(testName: string, metricName: string, type: MetricType, content: number) {
+  //   for (let i in this._abTests) {
+  //     if (this._abTests[i].testName == testName) {
+  //       this._abTests[i].addMetric(metricName, type, content);
+  //     }
+  //   }
+  // }
 
-  getMetric(testName: string, metricName: string): AbTestsCounterMetric {
-    for (let i in this._abTests) {
-      if (this._abTests[i].testName == testName) {
-        return this._abTests[i].getMetric(metricName)
-      }
-    }
-  }
+  // getMetric(testName: string, metricName: string): AbTestsCounterMetric {
+  //   for (let i in this._abTests) {
+  //     if (this._abTests[i].testName == testName) {
+  //       return this._abTests[i].getMetric(metricName)
+  //     }
+  //   }
+  // }
 
-  incrementCounter(testName: string, metricName: string) {
-    for (let i in this._abTests) {
-      if (this._abTests[i].testName == testName) {
-        this._abTests[i].incrementCounter(metricName);
-      }
-    }
-  }
+  // incrementCounter(testName: string, metricName: string) {
+  //   for (let i in this._abTests) {
+  //     if (this._abTests[i].testName == testName) {
+  //       this._abTests[i].incrementCounter(metricName);
+  //     }
+  //   }
+  // }
 
-  logAbResults() { // also sends
-    console.log(this._abTestsService.save(this._abTests))
-  }
+  // logAbResults() { // also sends
+  //   console.log(this._abTestsService.save(this._abTests))
 
-  saveAbResults(testNames?: string[]) {
-    // sends all if abTests unspecified
+  //   // this._abTestJsonSerializer.serialize(abTest.getMetrics());
+  // }
 
-    let tests: AbTest[] = [];
-    if (testNames) {
-      for (const testName of testNames) {
-        tests.push(this._abTests.find((t) => {
-          if (t.testName === testName) return t
-        }))
-      }
-    }
-    this._abTestsService.save(tests.length > 0 ? tests : this._abTests);
-  }
+  // saveAbResults(testNames?: string[]) {
+  //   // sends all if abTests unspecified
+
+  //   let tests: AbTest[] = [];
+  //   if (testNames) {
+  //     for (const testName of testNames) {
+  //       tests.push(this._abTests.find((t) => {
+  //         if (t.testName === testName) return t
+  //       }))
+  //     }
+  //   }
+  //   this._abTestsService.save(tests.length > 0 ? tests : this._abTests);
+  // }
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {

@@ -6,6 +6,9 @@ import { Hero } from '../hero';
 import { HeroService } from '../hero.service';
 import { AbTest } from 'src/framework/ab-test';
 import { Observable } from 'rxjs';
+import { AbTestsService } from 'src/framework/ab-tests.service';
+
+const TEST_NAME = "detailButtonEnter";
 
 @Component({
   selector: 'app-hero-detail',
@@ -14,26 +17,26 @@ import { Observable } from 'rxjs';
 })
 export class HeroDetailComponent implements OnInit {
   hero: Hero;
-  abTests$: Observable<AbTest[]>;
   abTest: AbTest;
-  private _testName = "detailButtonEnter";
   private _lastKeyPress = 0;
   private _timeClickedOn: number = 0;
 
   constructor(
     private route: ActivatedRoute,
     private heroService: HeroService,
+    private _abService: AbTestsService,
     private location: Location
   ) {
-    this.abTests$ = heroService.getAbTests();
-    this.abTests$.subscribe((r) => {
-      this.abTest = r.find((t) => t.testName === this._testName)
-    })
+    this.abTest = _abService.getAbTest(TEST_NAME);
   }
 
   ngOnInit(): void {
     this.getHero();
     this._timeClickedOn = performance.now();
+  }
+
+  ngOnDestroy(): void {
+    this._abService.save([this.abTest]);
   }
 
   getHero(): void {
@@ -43,31 +46,31 @@ export class HeroDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.heroService.addMetric(this._testName, "lastKeyPress", "timespan", this._lastKeyPress - this._timeClickedOn);
+    // this.abTest.addMetric()
+    this.abTest.addTimerMetric("lastKeyPress", this._lastKeyPress - this._timeClickedOn);
 
-    this.heroService.saveAbResults(["detailButtonEnter"]);
     this.location.back();
   }
 
   save(): void {
-    this.heroService.addMetric(this._testName, "saving", "timespan", performance.now() - this._timeClickedOn);
+    this.abTest.addTimerMetric("saving", performance.now() - this._timeClickedOn);
 
     this.heroService.updateHero(this.hero)
       .subscribe(() => this.goBack());
   }
 
   OnTextBoxFocus() {
-    this.heroService.addMetric(this._testName, "focusing", "timespan", performance.now() - this._timeClickedOn);
+    this.abTest.addTimerMetric("focusing", performance.now() - this._timeClickedOn);
   }
 
   OnTextBoxKeyDown(event: KeyboardEvent) {
     if (event.key.toLowerCase() !== "enter") {
       this._lastKeyPress = performance.now();
     } else {
-      if (this.heroService.getMetric(this._testName, "enterPresses")) {
-        this.heroService.incrementCounter(this._testName, "enterPresses")
+      if (this.abTest.getMetric("enterPresses")) {
+        this.abTest.incrementCounter("enterPresses")
       } else {
-        this.heroService.addMetric(this._testName, "enterPresses", "counter", 1);
+        this.abTest.addCounterMetric("enterPresses", 1);
       }
     }
   }

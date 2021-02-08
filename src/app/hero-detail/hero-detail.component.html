@@ -1,5 +1,3 @@
-<ng-container *ngIf="abTests$ | async as abTests">
-
 
 <div *ngIf="hero">
   <h2>{{hero.name | uppercase}} Details</h2>
@@ -14,7 +12,3 @@
   <button (click)="goBack()">go back</button>
   <button [ngClass]="{'makeinvisible': abTest.version == 'enter'}" (click)="save()">save</button>
 </div>
-
-<!-- <button *ngIf="abTest.version == 'new'" (click)="test()">test</button> -->
-
-</ng-container>
